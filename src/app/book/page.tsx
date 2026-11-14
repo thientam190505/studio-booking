@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Calendar, Check, Clock, Sparkles, User } from "lucide-react";
 import { formatVND } from "@/lib/format";
 
-type Service = { id: string; name: string; description: string; price: number; durationMinutes: number };
+type Service = {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  durationMinutes: number;
+  unavailableReason: string;
+};
 type Staff = { id: string; name: string; specialty: string };
 type Slot = { time: string; start: string; available: boolean };
 
@@ -61,8 +69,11 @@ export default function BookPage() {
   const visibleSlots = ready ? slots : [];
   const slot = visibleSlots.find((s) => s.start === slotStart && s.available) ?? null;
 
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
+    const svc = services.find((s) => s.id === id);
+    if (svc?.unavailableReason) return;
     setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -153,43 +164,61 @@ export default function BookPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {services.map((s) => {
                     const checked = selected.includes(s.id);
+                    const paused = Boolean(s.unavailableReason);
                     return (
                       <label
                         key={s.id}
-                        className={`relative flex cursor-pointer flex-col justify-between rounded-xl border p-4 transition focus-within:ring-2 focus-within:ring-indigo-500 ${
-                          checked
-                            ? "border-indigo-600 bg-indigo-50/70 shadow-sm"
-                            : "border-slate-200 bg-white hover:border-slate-300"
+                        className={`relative flex flex-col justify-between rounded-xl border p-4 transition focus-within:ring-2 focus-within:ring-indigo-500 ${
+                          paused
+                            ? "cursor-not-allowed border-amber-200 bg-amber-50/35 opacity-75"
+                            : checked
+                              ? "cursor-pointer border-indigo-600 bg-indigo-50/70 shadow-sm"
+                              : "cursor-pointer border-slate-200 bg-white hover:border-slate-300"
                         }`}
                       >
                         <input
                           type="checkbox"
                           name="services"
                           value={s.id}
+                          disabled={paused}
                           checked={checked}
                           onChange={() => toggle(s.id)}
                           className="sr-only"
                         />
                         <div className="flex items-start justify-between gap-2">
-                          <div>
+                          <div className="space-y-1">
+                            <span className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                              {s.category}
+                            </span>
                             <div className="font-semibold text-slate-900">{s.name}</div>
-                            <div className="mt-0.5 text-xs text-slate-500">{s.description}</div>
+                            <div className="text-xs text-slate-500">{s.description}</div>
                           </div>
-                          <span
-                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-white ${
-                              checked ? "border-indigo-600 bg-indigo-600" : "border-slate-300 bg-white"
-                            }`}
-                          >
-                            {checked && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
-                          </span>
+                          {!paused && (
+                            <span
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-white ${
+                                checked ? "border-indigo-600 bg-indigo-600" : "border-slate-300 bg-white"
+                              }`}
+                            >
+                              {checked && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+                            </span>
+                          )}
                         </div>
-                        <div className="mt-3 flex items-center justify-between text-sm">
-                          <span className="font-bold text-indigo-700">{formatVND(s.price)}</span>
-                          <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-                            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                            {s.durationMinutes} phút
-                          </span>
-                        </div>
+                        {paused ? (
+                          <div className="mt-3 flex items-center justify-between gap-2 text-xs">
+                            <span className="font-bold text-slate-500 line-through">{formatVND(s.price)}</span>
+                            <span className="rounded-md bg-amber-100 px-2 py-0.5 font-semibold text-amber-900">
+                              Tạm ngưng: {s.unavailableReason}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-3 flex items-center justify-between text-sm">
+                            <span className="font-bold text-indigo-700">{formatVND(s.price)}</span>
+                            <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+                              <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                              {s.durationMinutes} phút
+                            </span>
+                          </div>
+                        )}
                       </label>
                     );
                   })}

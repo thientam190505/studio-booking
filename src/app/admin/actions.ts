@@ -63,17 +63,52 @@ export async function resetTestBookings() {
 // ---------- Dịch vụ (Chỉ ADMIN) ----------
 const serviceSchema = z.object({
   name: z.string().trim().min(2),
+  category: z.string().trim().min(2).default("Cắt & Tạo kiểu"),
   description: z.string().trim().default(""),
   price: z.coerce.number().int().min(0),
   durationMinutes: z.coerce.number().int().min(15).max(480),
 });
+
+function revalidateServicePaths() {
+  revalidatePath("/admin/services");
+  revalidatePath("/book");
+  revalidatePath("/");
+}
 
 export async function createService(formData: FormData) {
   await requireAdmin();
   const parsed = serviceSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return;
   await prisma.service.create({ data: parsed.data });
-  revalidatePath("/admin/services");
+  revalidateServicePaths();
+}
+
+const updateServiceSchema = serviceSchema.extend({
+  id: z.string().min(1),
+});
+
+export async function updateService(formData: FormData) {
+  await requireAdmin();
+  const parsed = updateServiceSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return;
+  const { id, ...data } = parsed.data;
+  await prisma.service.update({ where: { id }, data }).catch(() => {});
+  revalidateServicePaths();
+}
+
+const unavailableSchema = z.object({
+  id: z.string().min(1),
+  reason: z.string().trim().default(""),
+});
+
+export async function setServiceUnavailable(formData: FormData) {
+  await requireAdmin();
+  const parsed = unavailableSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return;
+  await prisma.service
+    .update({ where: { id: parsed.data.id }, data: { unavailableReason: parsed.data.reason } })
+    .catch(() => {});
+  revalidateServicePaths();
 }
 
 export async function toggleService(id: string) {
@@ -81,7 +116,19 @@ export async function toggleService(id: string) {
   const s = await prisma.service.findUnique({ where: { id } });
   if (!s) return;
   await prisma.service.update({ where: { id }, data: { active: !s.active } });
-  revalidatePath("/admin/services");
+  revalidateServicePaths();
+}
+
+export async function deleteService(id: string) {
+  await requireAdmin();
+  const used = await prisma.bookingItem.count({ where: { serviceId: id } });
+  if (used > 0) {
+    // Bảo toàn lịch sử đơn đặt cũ bằng cách ẩn khỏi menu thay vì xóa cứng
+    await prisma.service.update({ where: { id }, data: { active: false } }).catch(() => {});
+  } else {
+    await prisma.service.delete({ where: { id } }).catch(() => {});
+  }
+  revalidateServicePaths();
 }
 
 // ---------- Nhân viên & nghỉ phép (ADMIN hoặc chính STAFF đó) ----------

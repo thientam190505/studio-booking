@@ -20,13 +20,15 @@ model User {
 }
 
 model Service {
-  id              String        @id @default(cuid())
-  name            String
-  description     String        @default("")
-  price           Int // VND
-  durationMinutes Int
-  active          Boolean       @default(true)
-  items           BookingItem[]
+  id                String        @id @default(cuid())
+  name              String
+  category          String        @default("Cắt & Tạo kiểu")
+  description       String        @default("")
+  price             Int // VND
+  durationMinutes   Int
+  active            Boolean       @default(true)
+  unavailableReason String        @default("")
+  items             BookingItem[]
 }
 
 model Staff {

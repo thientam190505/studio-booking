@@ -86,29 +86,46 @@ export default async function Home() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s) => (
-            <div key={s.id} className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-200 hover:shadow-md">
-              <div className="space-y-2">
-                <div className="flex items-start justify-between gap-2">
+          {services.map((s) => {
+            const paused = Boolean(s.unavailableReason);
+            return (
+              <div
+                key={s.id}
+                className={`flex flex-col justify-between rounded-2xl border bg-white p-5 shadow-sm transition ${
+                  paused ? "border-amber-200 bg-amber-50/20" : "border-slate-200 hover:border-indigo-200 hover:shadow-md"
+                }`}
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700">
+                      {s.category}
+                    </span>
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+                      <Clock className="h-3 w-3" aria-hidden="true" />
+                      {s.durationMinutes} phút
+                    </span>
+                  </div>
                   <h3 className="font-semibold text-slate-900">{s.name}</h3>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
-                    <Clock className="h-3 w-3" aria-hidden="true" />
-                    {s.durationMinutes} phút
-                  </span>
+                  <p className="text-sm text-slate-600">{s.description || "Dịch vụ chăm sóc chuyên nghiệp theo lịch hẹn."}</p>
                 </div>
-                <p className="text-sm text-slate-600">{s.description || "Dịch vụ chăm sóc chuyên nghiệp theo lịch hẹn."}</p>
+                <div className="mt-5 flex items-center justify-between gap-2 border-t border-slate-100 pt-4">
+                  <span className="text-lg font-bold text-indigo-600">{formatVND(s.price)}</span>
+                  {paused ? (
+                    <span className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                      Tạm ngưng: {s.unavailableReason}
+                    </span>
+                  ) : (
+                    <Link
+                      href="/book"
+                      className="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
+                    >
+                      Đặt lịch →
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-                <span className="text-lg font-bold text-indigo-600">{formatVND(s.price)}</span>
-                <Link
-                  href="/book"
-                  className="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
-                >
-                  Đặt lịch →
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

@@ -22,10 +22,10 @@ const DEPOSIT_RATE = 0.2;
 
 export async function createBooking(input: z.infer<typeof createBookingSchema>) {
   const services = await prisma.service.findMany({
-    where: { id: { in: input.serviceIds }, active: true },
+    where: { id: { in: input.serviceIds }, active: true, unavailableReason: "" },
   });
   if (services.length !== new Set(input.serviceIds).size) {
-    throw new BookingError("Dịch vụ không hợp lệ");
+    throw new BookingError("Dịch vụ không hợp lệ hoặc đang tạm ngưng");
   }
 
   const totalDuration = services.reduce((s, x) => s + x.durationMinutes, 0);
