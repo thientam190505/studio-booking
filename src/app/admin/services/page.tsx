@@ -1,7 +1,7 @@
-import { Layers, Plus } from "lucide-react";
+import { Layers, Plus, RotateCcw } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createService } from "../actions";
+import { createService, restoreDemoMenu } from "../actions";
 import AdminNav from "../AdminNav";
 import ServiceItemCard from "./ServiceItemCard";
 
@@ -37,7 +37,7 @@ export default async function ServicesPage() {
             Thêm món mới vào Menu, chỉnh sửa giá/thời lượng, tạm ngưng khi hết nguyên liệu hoặc ẩn dịch vụ.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs font-extrabold">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold">
           <span className="rounded-full border-2 border-emerald-700/30 bg-emerald-100 px-3 py-1 text-emerald-950">
             Mở bán: {activeCount}
           </span>
@@ -47,6 +47,15 @@ export default async function ServicesPage() {
           <span className="rounded-full border-2 border-stone-400 bg-stone-200 px-3 py-1 text-stone-900">
             Đang ẩn: {hiddenCount}
           </span>
+          <form action={restoreDemoMenu}>
+            <button
+              type="submit"
+              className="btn-interactive inline-flex items-center gap-1.5 rounded-full border-2 border-stone-400 bg-white px-3 py-1.5 text-xs font-extrabold text-stone-950 hover:border-stone-900 hover:bg-stone-900 hover:text-white"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Khôi phục Menu gốc</span>
+            </button>
+          </form>
         </div>
       </div>
 

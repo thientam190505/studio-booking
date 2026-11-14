@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { DEFAULT_SERVICES } from "../src/lib/demo-seed";
 
 const prisma = new PrismaClient();
 
@@ -35,13 +36,7 @@ async function main() {
   }
 
   await prisma.service.createMany({
-    data: [
-      { name: "Cắt tóc nam", category: "Cắt & Tạo kiểu", description: "Cắt, gội, sấy tạo kiểu", price: 120000, durationMinutes: 30 },
-      { name: "Cắt tóc nữ", category: "Cắt & Tạo kiểu", description: "Cắt, gội, sấy", price: 180000, durationMinutes: 60 },
-      { name: "Nhuộm tóc", category: "Uốn & Nhuộm", description: "Nhuộm màu thời trang", price: 450000, durationMinutes: 90 },
-      { name: "Uốn / Duỗi", category: "Uốn & Nhuộm", description: "Uốn hoặc duỗi phục hồi", price: 600000, durationMinutes: 120 },
-      { name: "Gội đầu dưỡng sinh", category: "Gội & Chăm sóc", description: "Massage da đầu thư giãn", price: 150000, durationMinutes: 45 },
-    ],
+    data: DEFAULT_SERVICES.map((s) => ({ ...s })),
   });
 
   console.log("Seed OK. Admin: admin@demo.com / admin123");

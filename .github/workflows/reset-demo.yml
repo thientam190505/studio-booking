@@ -1,0 +1,28 @@
+name: Reset Demo Database
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reset-seed:
+    name: Khôi phục dữ liệu mẫu PostgreSQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lấy mã nguồn nhánh main
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Cài đặt thư viện
+        run: npm ci
+
+      - name: Đồng bộ schema & bơm lại dữ liệu mẫu gốc
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npx prisma db push
+          npm run seed

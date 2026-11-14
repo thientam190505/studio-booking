@@ -8,6 +8,7 @@ import { dayStart } from "@/lib/availability";
 import { sendBookingConfirmation } from "@/lib/email";
 import { z } from "zod";
 import { clearSessionCookie, requireAdmin, requireStaffOrAdmin, setSessionCookie } from "@/lib/auth";
+import { restoreMenuToDefault } from "@/lib/demo-seed";
 
 export async function login(_: string | undefined, formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
@@ -58,6 +59,29 @@ export async function resetTestBookings() {
   revalidatePath("/admin");
   revalidatePath("/admin/calendar");
   revalidatePath("/book");
+}
+
+/** Khôi phục 5 dịch vụ mẫu gốc (tránh trường hợp demo bị xóa/sửa sạch Menu). */
+export async function restoreDemoMenu() {
+  await requireAdmin();
+  await restoreMenuToDefault(prisma, true);
+  revalidateServicePaths();
+}
+
+/** Khôi phục toàn bộ dữ liệu Demo về trạng thái ban đầu (Menu + ca làm + lịch). */
+export async function resetFullDemo() {
+  await requireAdmin();
+  await prisma.bookingItem.deleteMany();
+  await prisma.booking.deleteMany();
+  await prisma.timeOff.deleteMany();
+  await prisma.staff.updateMany({
+    data: { workStart: 540, workEnd: 1080, workDays: "0,1,2,3,4,5,6" },
+  });
+  await restoreMenuToDefault(prisma, true);
+  revalidateServicePaths();
+  revalidatePath("/admin");
+  revalidatePath("/admin/calendar");
+  revalidatePath("/admin/staff");
 }
 
 // ---------- Dịch vụ (Chỉ ADMIN) ----------

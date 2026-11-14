@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarCheck2, Clock, CreditCard, Scissors, Search, Sparkles, UserCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { ensureDefaultMenu } from "@/lib/demo-seed";
 import { formatVND } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 export default async function Home() {
+  await ensureDefaultMenu();
   const [services, staff] = await Promise.all([
     prisma.service.findMany({ where: { active: true }, orderBy: { price: "asc" } }),
     prisma.staff.findMany({ include: { user: { select: { name: true } } } }),

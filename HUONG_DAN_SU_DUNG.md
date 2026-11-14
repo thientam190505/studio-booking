@@ -114,8 +114,10 @@ Nhiều bạn quen với các dự án web cơ bản chỉ gồm `index.html` + 
 3. Chạy web: nhấp đúp **`CHAY_WEB.bat`** hoặc gõ `npm run dev` rồi mở `http://localhost:3000`.
 
 ### Khi muốn khôi phục Database về dữ liệu gốc ban đầu (Reset sạch):
-* **Cách nhanh nhất (không cần gõ lệnh):** Đăng nhập `/admin` bằng tài khoản Chủ tiệm (`admin@demo.com` / `admin123`) rồi bấm nút **`Reset lịch test`** trên trang quản trị để xóa các lịch test.
-* **Reset toàn bộ bảng & dữ liệu mẫu qua Terminal:**
+* **Cách 1 — Tự động hồi sinh khi Menu trống:** Nếu ai đó lỡ xóa/ẩn sạch toàn bộ dịch vụ ngoài Menu, khi mở lại trang chủ (`/`) hoặc `/book`, hệ thống tự động tạo lại đủ 5 dịch vụ mẫu gốc (`ensureDefaultMenu`).
+* **Cách 2 — Bấm 1 nút ngay trên Web (`/admin`):** Đăng nhập `/admin` bằng tài khoản Chủ tiệm (`admin@demo.com` / `admin123`), bấm nút **`Khôi phục mẫu gốc`** (hoặc **`Khôi phục Menu gốc`** trong `/admin/services`) để đưa toàn bộ 5 dịch vụ, ca làm và lịch về trạng thái sạch ban đầu.
+* **Cách 3 — Bấm 1 nút ngay trên GitHub (`Actions`):** Trên GitHub repo, vào tab **Actions** → chọn **Reset Demo Database** → bấm **Run workflow** (chạy `npx prisma db push && npm run seed` qua secret `DATABASE_URL`).
+* **Cách 4 — Qua Terminal:**
   ```powershell
   npx prisma db push && npm run seed
   ```

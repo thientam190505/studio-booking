@@ -3,7 +3,7 @@ import { CalendarCheck, CircleDollarSign, Clock, RotateCcw, Scissors, TrendingUp
 import { requireStaffOrAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatVND } from "@/lib/format";
-import { resetTestBookings, updateBookingStatus } from "./actions";
+import { resetFullDemo, resetTestBookings, updateBookingStatus } from "./actions";
 import AdminNav from "./AdminNav";
 
 export const dynamic = "force-dynamic";
@@ -100,6 +100,17 @@ export default async function AdminPage() {
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 <span>Reset lịch test ({bookings.length})</span>
+              </button>
+            </form>
+          )}
+          {!isStaff && (
+            <form action={resetFullDemo}>
+              <button
+                type="submit"
+                className="btn-interactive inline-flex items-center gap-1.5 rounded-full border-2 border-amber-700/40 bg-amber-50 px-3.5 py-2 text-sm font-bold text-amber-950 hover:border-amber-800 hover:bg-amber-800 hover:text-white"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                <span>Khôi phục mẫu gốc</span>
               </button>
             </form>
           )}
