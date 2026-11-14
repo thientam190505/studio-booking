@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite không hỗ trợ enum -> dùng String, validate bằng zod ở tầng ứng dụng.
+// Role: ADMIN | STAFF | CUSTOMER
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("CUSTOMER")
+  createdAt    DateTime @default(now())
+  staff        Staff?
+}
+
+model Service {
+  id              String        @id @default(cuid())
+  name            String
+  description     String        @default("")
+  price           Int // VND
+  durationMinutes Int
+  active          Boolean       @default(true)
+  items           BookingItem[]
+}
+
+model Staff {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  specialty String    @default("")
+  // Giờ làm việc tính bằng phút từ 00:00 (vd 9:00 = 540)
+  workStart Int       @default(540)
+  workEnd   Int       @default(1080)
+  // Các thứ làm việc, "1,2,3,4,5,6" (0 = CN)
+  workDays  String    @default("1,2,3,4,5,6")
+  bookings  Booking[]
+  timeOffs  TimeOff[]
+}
+
+model TimeOff {
+  id      String   @id @default(cuid())
+  staffId String
+  staff   Staff    @relation(fields: [staffId], references: [id])
+  start   DateTime
+  end     DateTime
+  reason  String   @default("")
+
+  @@index([staffId, start])
+}
+
+// Status: PENDING | CONFIRMED | COMPLETED | CANCELLED
+model Booking {
+  id             String        @id @default(cuid())
+  code           String        @unique
+  customerName   String
+  customerPhone  String
+  customerEmail  String
+  staffId        String
+  staff          Staff         @relation(fields: [staffId], references: [id])
+  startTime      DateTime
+  endTime        DateTime
+  totalPrice     Int
+  depositAmount  Int
+  status         String        @default("PENDING")
+  // Giữ chỗ tạm cho đến khi thanh toán cọc (PENDING hết hạn sẽ được giải phóng)
+  holdExpiresAt  DateTime?
+  createdAt      DateTime      @default(now())
+  items          BookingItem[]
+
+  @@index([staffId, startTime, endTime])
+  @@index([customerPhone])
+}
+
+model BookingItem {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+  price     Int
+  duration  Int
+}
