@@ -13,7 +13,7 @@ function secret() {
 
 const sign = (payload: string) => createHmac("sha256", secret()).update(payload).digest("base64url");
 
-export type Session = { userId: string; role: string; name: string };
+export type Session = { userId: string; role: string; name: string; staffId?: string };
 
 export function createToken(s: Session) {
   const payload = Buffer.from(JSON.stringify({ ...s, exp: Date.now() + MAX_AGE * 1000 })).toString("base64url");
@@ -30,17 +30,29 @@ export function verifyToken(token?: string): Session | null {
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   const data = JSON.parse(Buffer.from(payload, "base64url").toString());
   if (data.exp < Date.now()) return null;
-  return { userId: data.userId, role: data.role, name: data.name };
+  return {
+    userId: data.userId,
+    role: data.role,
+    name: data.name,
+    ...(data.staffId ? { staffId: data.staffId } : {}),
+  };
 }
 
 export async function getSession() {
   return verifyToken((await cookies()).get(COOKIE)?.value);
 }
 
-/** Dùng trong trang/server action của khu vực admin (RBAC). */
+/** Chỉ dành cho Chủ quán (ADMIN). */
 export async function requireAdmin() {
   const s = await getSession();
   if (!s || s.role !== "ADMIN") redirect("/admin/login");
+  return s;
+}
+
+/** Cho phép cả Chủ quán (ADMIN) và Thợ (STAFF) đăng nhập vào khu vực lịch làm việc. */
+export async function requireStaffOrAdmin() {
+  const s = await getSession();
+  if (!s || (s.role !== "ADMIN" && s.role !== "STAFF")) redirect("/admin/login");
   return s;
 }
 

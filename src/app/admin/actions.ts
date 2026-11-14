@@ -7,15 +7,21 @@ import { prisma } from "@/lib/prisma";
 import { dayStart } from "@/lib/availability";
 import { sendBookingConfirmation } from "@/lib/email";
 import { z } from "zod";
-import { clearSessionCookie, requireAdmin, setSessionCookie } from "@/lib/auth";
+import { clearSessionCookie, requireAdmin, requireStaffOrAdmin, setSessionCookie } from "@/lib/auth";
 
 export async function login(_: string | undefined, formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const user = await prisma.user.findUnique({ where: { email } });
-  const ok = user && user.role === "ADMIN" && (await bcrypt.compare(password, user.passwordHash));
+  const user = await prisma.user.findUnique({ where: { email }, include: { staff: true } });
+  const allowedRole = user && (user.role === "ADMIN" || user.role === "STAFF");
+  const ok = allowedRole && (await bcrypt.compare(password, user.passwordHash));
   if (!user || !ok) return "Sai email hoặc mật khẩu";
-  await setSessionCookie({ userId: user.id, role: user.role, name: user.name });
+  await setSessionCookie({
+    userId: user.id,
+    role: user.role,
+    name: user.name,
+    staffId: user.staff?.id,
+  });
   redirect("/admin");
 }
 
@@ -30,9 +36,11 @@ const TRANSITIONS: Record<string, string[]> = {
 };
 
 export async function updateBookingStatus(id: string, status: string) {
-  await requireAdmin();
+  const session = await requireStaffOrAdmin();
   const b = await prisma.booking.findUnique({ where: { id } });
   if (!b || !TRANSITIONS[b.status]?.includes(status)) return;
+  // Thợ chỉ được cập nhật trạng thái lịch hẹn của chính mình
+  if (session.role === "STAFF" && b.staffId !== session.staffId) return;
   await prisma.booking.update({
     where: { id },
     data: { status, holdExpiresAt: status === "CONFIRMED" ? null : b.holdExpiresAt },
@@ -42,7 +50,7 @@ export async function updateBookingStatus(id: string, status: string) {
   if (status === "CONFIRMED") await sendBookingConfirmation(b.code);
 }
 
-// ---------- Dịch vụ ----------
+// ---------- Dịch vụ (Chỉ ADMIN) ----------
 const serviceSchema = z.object({
   name: z.string().trim().min(2),
   description: z.string().trim().default(""),
@@ -66,7 +74,7 @@ export async function toggleService(id: string) {
   revalidatePath("/admin/services");
 }
 
-// ---------- Nhân viên & nghỉ phép ----------
+// ---------- Nhân viên & nghỉ phép (ADMIN hoặc chính STAFF đó) ----------
 const timeOffSchema = z.object({
   staffId: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -75,9 +83,10 @@ const timeOffSchema = z.object({
 
 /** Cho nghỉ cả ngày (theo múi giờ cửa hàng). */
 export async function createTimeOff(formData: FormData) {
-  await requireAdmin();
+  const session = await requireStaffOrAdmin();
   const parsed = timeOffSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return;
+  if (session.role === "STAFF" && parsed.data.staffId !== session.staffId) return;
   const start = dayStart(parsed.data.date);
   await prisma.timeOff.create({
     data: {
@@ -91,7 +100,10 @@ export async function createTimeOff(formData: FormData) {
 }
 
 export async function deleteTimeOff(id: string) {
-  await requireAdmin();
+  const session = await requireStaffOrAdmin();
+  const t = await prisma.timeOff.findUnique({ where: { id } });
+  if (!t) return;
+  if (session.role === "STAFF" && t.staffId !== session.staffId) return;
   await prisma.timeOff.delete({ where: { id } }).catch(() => {});
   revalidatePath("/admin/staff");
 }
@@ -104,9 +116,10 @@ const hoursSchema = z.object({
 const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
 
 export async function updateStaffHours(formData: FormData) {
-  await requireAdmin();
+  const session = await requireStaffOrAdmin();
   const parsed = hoursSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return;
+  if (session.role === "STAFF" && parsed.data.staffId !== session.staffId) return;
   const workStart = toMin(parsed.data.workStart);
   const workEnd = toMin(parsed.data.workEnd);
   if (workEnd <= workStart) return;

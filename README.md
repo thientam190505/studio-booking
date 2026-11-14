@@ -2,7 +2,9 @@
 
 Web fullstack đặt lịch hẹn (salon/studio/phòng khám): khách chọn dịch vụ → nhân viên → khung giờ trống theo thời gian thực, cọc online (mô phỏng), admin quản lý lịch, ca làm và doanh thu.
 
-> **Live demo:** _(thêm link Vercel sau khi deploy)_ · **Admin demo:** `admin@demo.com` / `admin123`
+> **Live demo:** _(thêm link Vercel sau khi deploy)_
+> - **Chủ quán (`ADMIN`):** `admin@demo.com` / `admin123` (toàn quyền)
+> - **3 Thợ (`STAFF`):** `minhanh@demo.com`, `quocbao@demo.com`, `thuha@demo.com` / `staff123` (chỉ thấy lịch & ca làm của riêng mình)
 
 ## Điểm kỹ thuật nổi bật
 

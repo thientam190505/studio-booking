@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { requireAdmin } from "@/lib/auth";
+import { requireStaffOrAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SHOP_TZ_OFFSET, dayStart } from "@/lib/availability";
 import AdminNav from "../AdminNav";
@@ -40,7 +40,8 @@ export default async function CalendarPage({
 }: {
   searchParams: Promise<{ week?: string; staff?: string }>;
 }) {
-  const session = await requireAdmin();
+  const session = await requireStaffOrAdmin();
+  const isStaff = session.role === "STAFF";
   const sp = await searchParams;
   const todayStr = ymd(new Date());
   const base = /^\d{4}-\d{2}-\d{2}$/.test(sp.week ?? "") ? sp.week! : todayStr;
@@ -49,31 +50,35 @@ export default async function CalendarPage({
   const from = dayStart(monday);
   const to = dayStart(addDays(monday, 7));
 
+  const filterStaffId = isStaff ? (session.staffId ?? "__none__") : sp.staff;
+
   const [staff, bookings] = await Promise.all([
     prisma.staff.findMany({ include: { user: true } }),
     prisma.booking.findMany({
       where: {
         status: { in: ["PENDING", "CONFIRMED", "COMPLETED"] },
         startTime: { gte: from, lt: to },
-        ...(sp.staff ? { staffId: sp.staff } : {}),
+        ...(filterStaffId ? { staffId: filterStaffId } : {}),
       },
       include: { staff: { include: { user: true } }, items: { include: { service: true } } },
     }),
   ]);
 
   const hours = Array.from({ length: HOUR_TO - HOUR_FROM }, (_, i) => HOUR_FROM + i);
-  const q = (week: string) => `?week=${week}${sp.staff ? `&staff=${sp.staff}` : ""}`;
+  const q = (week: string) => `?week=${week}${!isStaff && sp.staff ? `&staff=${sp.staff}` : ""}`;
 
   return (
     <main className="mx-auto max-w-6xl space-y-5 px-4 py-8 sm:px-6">
-      <AdminNav name={session.name} />
+      <AdminNav name={session.name} role={session.role} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Lịch tuần ({days[0].slice(8)}/{days[0].slice(5, 7)} – {days[6].slice(8)}/{days[6].slice(5, 7)})
+            {isStaff ? `Lịch tuần của ${session.name}` : "Lịch tuần"} ({days[0].slice(8)}/{days[0].slice(5, 7)} – {days[6].slice(8)}/{days[6].slice(5, 7)})
           </h1>
-          <p className="text-sm text-slate-600">Theo dõi mật độ lịch hẹn theo từng khung giờ (UTC+7).</p>
+          <p className="text-sm text-slate-600">
+            {isStaff ? "Các khung giờ khách đã đặt riêng với bạn trong tuần (UTC+7)." : "Theo dõi mật độ lịch hẹn theo từng khung giờ (UTC+7)."}
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
           <Link href={q(addDays(monday, -7))} className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50">
@@ -92,24 +97,30 @@ export default async function CalendarPage({
 
       {/* Bộ lọc nhân viên */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-          <span className="text-slate-500">Nhân viên:</span>
-          <Link
-            href={`?week=${monday}`}
-            className={`rounded-full px-3 py-1.5 transition ${!sp.staff ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
-          >
-            Tất cả NV
-          </Link>
-          {staff.map((s) => (
+        {isStaff ? (
+          <div className="text-xs font-semibold text-slate-700">
+            Chuyên viên: <span className="rounded-full bg-indigo-50 px-3 py-1 text-indigo-700">{session.name}</span>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+            <span className="text-slate-500">Nhân viên:</span>
             <Link
-              key={s.id}
-              href={`?week=${monday}&staff=${s.id}`}
-              className={`rounded-full px-3 py-1.5 transition ${sp.staff === s.id ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
+              href={`?week=${monday}`}
+              className={`rounded-full px-3 py-1.5 transition ${!sp.staff ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
             >
-              {s.user.name}
+              Tất cả NV
             </Link>
-          ))}
-        </div>
+            {staff.map((s) => (
+              <Link
+                key={s.id}
+                href={`?week=${monday}&staff=${s.id}`}
+                className={`rounded-full px-3 py-1.5 transition ${sp.staff === s.id ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
+              >
+                {s.user.name}
+              </Link>
+            ))}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
           <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-amber-500" /> Chờ cọc</span>
           <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500" /> Đã xác nhận</span>
@@ -162,7 +173,7 @@ export default async function CalendarPage({
                         {hhmm(b.startTime)} · {b.customerName}
                       </div>
                       <div className="truncate text-[10px] opacity-80">
-                        {b.items.map((i) => i.service.name).join(", ")} · {b.staff.user.name}
+                        {b.items.map((i) => i.service.name).join(", ")} {!isStaff && `· ${b.staff.user.name}`}
                       </div>
                     </div>
                   );

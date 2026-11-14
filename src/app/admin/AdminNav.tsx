@@ -5,20 +5,27 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, ClipboardList, LogOut, Sparkles, Users } from "lucide-react";
 import { logout } from "./actions";
 
-const LINKS = [
-  { href: "/admin", label: "Lịch hẹn", icon: ClipboardList },
-  { href: "/admin/calendar", label: "Lịch tuần", icon: CalendarDays },
-  { href: "/admin/services", label: "Dịch vụ", icon: Sparkles },
-  { href: "/admin/staff", label: "Nhân viên", icon: Users },
-];
-
-export default function AdminNav({ name }: { name: string }) {
+export default function AdminNav({ name, role = "ADMIN" }: { name: string; role?: string }) {
   const pathname = usePathname() || "/admin";
+  const isStaff = role === "STAFF";
+
+  const links = isStaff
+    ? [
+        { href: "/admin", label: "Lịch của tôi", icon: ClipboardList },
+        { href: "/admin/calendar", label: "Lịch tuần cá nhân", icon: CalendarDays },
+        { href: "/admin/staff", label: "Ca làm & Nghỉ phép", icon: Users },
+      ]
+    : [
+        { href: "/admin", label: "Lịch hẹn", icon: ClipboardList },
+        { href: "/admin/calendar", label: "Lịch tuần", icon: CalendarDays },
+        { href: "/admin/services", label: "Dịch vụ", icon: Sparkles },
+        { href: "/admin/staff", label: "Nhân viên", icon: Users },
+      ];
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
       <nav aria-label="Menu quản trị" className="flex flex-wrap items-center gap-1.5 text-sm font-medium">
-        {LINKS.map((l) => {
+        {links.map((l) => {
           const active = pathname === l.href;
           const Icon = l.icon;
           return (
@@ -37,9 +44,13 @@ export default function AdminNav({ name }: { name: string }) {
           );
         })}
       </nav>
-      <form action={logout} className="flex items-center gap-3 text-sm">
-        <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-          {name}
+      <form action={logout} className="flex items-center gap-2.5 text-sm">
+        <span
+          className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
+            isStaff ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-700"
+          }`}
+        >
+          {isStaff ? `Thợ: ${name}` : `Chủ quán: ${name}`}
         </span>
         <button
           type="submit"

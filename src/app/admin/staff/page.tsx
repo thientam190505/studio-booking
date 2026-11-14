@@ -1,5 +1,5 @@
 import { CalendarOff, Clock, Trash2 } from "lucide-react";
-import { requireAdmin } from "@/lib/auth";
+import { requireStaffOrAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createTimeOff, deleteTimeOff, updateStaffHours } from "../actions";
 import AdminNav from "../AdminNav";
@@ -11,8 +11,11 @@ const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "Asia/Ho_Chi_Minh" }).format(d);
 
 export default async function StaffPage() {
-  const session = await requireAdmin();
+  const session = await requireStaffOrAdmin();
+  const isStaff = session.role === "STAFF";
+
   const staff = await prisma.staff.findMany({
+    where: isStaff ? { id: session.staffId ?? "__none__" } : undefined,
     include: { user: true, timeOffs: { where: { end: { gt: new Date() } }, orderBy: { start: "asc" } } },
   });
   const inputCls =
@@ -20,14 +23,18 @@ export default async function StaffPage() {
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
-      <AdminNav name={session.name} />
+      <AdminNav name={session.name} role={session.role} />
 
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Nhân viên & ca làm</h1>
-        <p className="text-sm text-slate-600">Cập nhật giờ làm việc và ngày nghỉ phép; lịch trống của khách tự động tính lại theo cài đặt này.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          {isStaff ? `Ca làm & Ngày nghỉ của ${session.name}` : "Nhân viên & ca làm"}
+        </h1>
+        <p className="text-sm text-slate-600">
+          Cập nhật giờ làm việc và ngày nghỉ phép; lịch trống của khách tự động tính lại theo cài đặt này.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={`grid gap-4 ${isStaff ? "max-w-xl" : "md:grid-cols-2"}`}>
         {staff.map((s) => (
           <section key={s.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-3">

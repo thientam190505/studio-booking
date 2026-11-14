@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CalendarCheck, CircleDollarSign, Clock, TrendingUp, Wallet } from "lucide-react";
-import { requireAdmin } from "@/lib/auth";
+import { CalendarCheck, CircleDollarSign, Clock, Scissors, TrendingUp, Wallet } from "lucide-react";
+import { requireStaffOrAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatVND } from "@/lib/format";
 import { updateBookingStatus } from "./actions";
@@ -37,8 +37,11 @@ const fmtTime = (d: Date) =>
   new Intl.DateTimeFormat("vi-VN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Ho_Chi_Minh" }).format(d);
 
 export default async function AdminPage() {
-  const session = await requireAdmin();
+  const session = await requireStaffOrAdmin();
+  const isStaff = session.role === "STAFF";
+
   const bookings = await prisma.booking.findMany({
+    where: isStaff ? { staffId: session.staffId ?? "__none__" } : undefined,
     orderBy: { startTime: "asc" },
     include: { staff: { include: { user: true } }, items: { include: { service: true } } },
   });
@@ -59,27 +62,40 @@ export default async function AdminPage() {
     byDay.set(k, [...(byDay.get(k) ?? []), b]);
   });
 
-  const stats = [
-    { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-50 text-emerald-600" },
-    { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-indigo-50 text-indigo-600" },
-    { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-amber-50 text-amber-600" },
-    { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-blue-50 text-blue-600" },
-  ];
+  const stats = isStaff
+    ? [
+        { label: "Ca sắp làm (Đã xác nhận)", value: `${count("CONFIRMED")} ca`, icon: Scissors, tone: "bg-blue-50 text-blue-600" },
+        { label: "Đang chờ khách cọc", value: `${count("PENDING")} ca`, icon: Clock, tone: "bg-amber-50 text-amber-600" },
+        { label: "Ca đã hoàn thành", value: `${count("COMPLETED")} ca`, icon: CalendarCheck, tone: "bg-emerald-50 text-emerald-600" },
+        { label: "Tổng lịch của tôi", value: `${bookings.filter((b) => b.status !== "CANCELLED").length} lịch`, icon: TrendingUp, tone: "bg-indigo-50 text-indigo-600" },
+      ]
+    : [
+        { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-50 text-emerald-600" },
+        { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-indigo-50 text-indigo-600" },
+        { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-amber-50 text-amber-600" },
+        { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-blue-50 text-blue-600" },
+      ];
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
-      <AdminNav name={session.name} />
+      <AdminNav name={session.name} role={session.role} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard quản trị</h1>
-          <p className="text-sm text-slate-600">Theo dõi doanh thu, trạng thái lịch hẹn và cập nhật tiến độ phục vụ.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            {isStaff ? `Lịch làm việc của ${session.name}` : "Dashboard quản trị"}
+          </h1>
+          <p className="text-sm text-slate-600">
+            {isStaff
+              ? "Chỉ hiển thị các lịch hẹn khách đã chọn bạn — xem rõ khung giờ, dịch vụ cần thực hiện và cập nhật trạng thái."
+              : "Theo dõi doanh thu toàn tiệm, trạng thái lịch hẹn của tất cả nhân viên và cập nhật tiến độ phục vụ."}
+          </p>
         </div>
         <Link
           href="/admin/calendar"
           className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
         >
-          Xem lịch tuần dạng lưới →
+          {isStaff ? "Xem lịch tuần của tôi →" : "Xem lịch tuần dạng lưới →"}
         </Link>
       </div>
 
@@ -105,7 +121,7 @@ export default async function AdminPage() {
         <section className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm">
           <span className="inline-flex items-center gap-1.5 font-semibold text-slate-700">
             <TrendingUp className="h-4 w-4 text-indigo-600" aria-hidden="true" />
-            Dịch vụ phổ biến:
+            {isStaff ? "Dịch vụ bạn làm nhiều nhất:" : "Dịch vụ phổ biến:"}
           </span>
           {top.map(([n, c]) => (
             <span key={n} className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
@@ -117,11 +133,23 @@ export default async function AdminPage() {
 
       {bookings.length === 0 && (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-          Chưa có lịch hẹn nào trong hệ thống. Hãy thử{" "}
-          <Link href="/book" className="font-semibold text-indigo-600 underline">
-            đặt một lịch mẫu
-          </Link>{" "}
-          để kiểm tra!
+          {isStaff ? (
+            <>
+              Hiện chưa có khách nào đặt lịch với <b>{session.name}</b>. Hãy thử qua trang{" "}
+              <Link href="/book" className="font-semibold text-indigo-600 underline">
+                Đặt lịch
+              </Link>{" "}
+              và chọn chuyên viên <b>{session.name}</b> để kiểm tra!
+            </>
+          ) : (
+            <>
+              Chưa có lịch hẹn nào trong hệ thống. Hãy thử{" "}
+              <Link href="/book" className="font-semibold text-indigo-600 underline">
+                đặt một lịch mẫu
+              </Link>{" "}
+              để kiểm tra!
+            </>
+          )}
         </div>
       )}
 
@@ -130,25 +158,35 @@ export default async function AdminPage() {
           <section key={day} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-3">
               <h2 className="text-sm font-semibold capitalize text-slate-900">{day}</h2>
-              <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600 border border-slate-200">
-                {list.length} lịch hẹn
+              <span className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
+                {list.length} ca hẹn
               </span>
             </div>
             <ul className="divide-y divide-slate-100">
               {list.map((b) => (
                 <li key={b.id} className="flex flex-wrap items-center gap-4 px-5 py-4 text-sm transition hover:bg-slate-50/50">
-                  <div className="w-28 shrink-0">
-                    <div className="font-mono text-sm font-bold text-slate-900">
+                  <div className="w-32 shrink-0 rounded-xl bg-indigo-50/70 px-3 py-2 text-center">
+                    <div className="font-mono text-sm font-bold text-indigo-950">
                       {fmtTime(b.startTime)} – {fmtTime(b.endTime)}
                     </div>
-                    <div className="font-mono text-xs text-slate-500">#{b.code}</div>
+                    <div className="font-mono text-[11px] text-indigo-600">#{b.code}</div>
                   </div>
-                  <div className="min-w-52 flex-1 space-y-0.5">
+                  <div className="min-w-52 flex-1 space-y-1.5">
                     <div className="font-semibold text-slate-900">
-                      {b.customerName} <span className="font-normal text-slate-500">· {b.customerPhone}</span>
+                      Khách: {b.customerName} <span className="font-normal text-slate-500">· {b.customerPhone}</span>
                     </div>
-                    <div className="text-xs text-slate-600">
-                      {b.items.map((i) => i.service.name).join(", ")} · NV: <b>{b.staff.user.name}</b> · Tổng: <b>{formatVND(b.totalPrice)}</b>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {b.items.map((i) => (
+                        <span key={i.id} className="inline-flex items-center gap-1 rounded-lg border border-indigo-100 bg-indigo-50/60 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
+                          <Scissors className="h-3 w-3" aria-hidden="true" />
+                          {i.service.name} ({i.duration}p)
+                        </span>
+                      ))}
+                      {!isStaff && (
+                        <span className="text-xs text-slate-600">
+                          · Thợ: <b>{b.staff.user.name}</b> · Tổng: <b>{formatVND(b.totalPrice)}</b>
+                        </span>
+                      )}
                     </div>
                   </div>
                   <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_COLOR[b.status]}`}>
