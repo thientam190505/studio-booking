@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eef2f6;
+  --background: #e8eef8;
   --foreground: #0f172a;
   color-scheme: light;
   accent-color: #4f46e5;
@@ -21,12 +21,29 @@
 
 body {
   background-color: var(--background);
-  background-image:
-    radial-gradient(at 12% 0%, rgba(79, 70, 229, 0.09) 0px, transparent 50%),
-    radial-gradient(at 88% 12%, rgba(16, 185, 129, 0.07) 0px, transparent 45%);
-  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Nền đa tầng Ambient Aurora & Lưới kiến trúc cho màn hình rộng */
+.bg-ambient-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 30%, #f1f5f9 65%, #dcfce7 100%);
+}
+
+.bg-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(79, 70, 229, 0.16) 1px, transparent 1px),
+    linear-gradient(to right, rgba(79, 70, 229, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(79, 70, 229, 0.07) 1px, transparent 1px);
+  background-size: 36px 36px;
+  background-position: -0.5px -0.5px, 0 0, 0 0;
 }
 
 /* Input/select luôn chữ tối, nền trắng (tránh bị chữ trắng khi trình duyệt ở dark mode) */
