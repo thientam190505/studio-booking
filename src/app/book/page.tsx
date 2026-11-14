@@ -16,7 +16,13 @@ export default function BookPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [staffId, setStaffId] = useState("");
-  const [date, setDate] = useState(today());
+  // Khởi tạo rỗng rồi set ở client, tránh ngày bị "đóng băng" lúc build/prerender
+  const [date, setDate] = useState("");
+  const [minDate, setMinDate] = useState("");
+  useEffect(() => {
+    setMinDate(today());
+    setDate(today());
+  }, []);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [form, setForm] = useState({ customerName: "", customerPhone: "", customerEmail: "" });
@@ -38,7 +44,7 @@ export default function BookPage() {
 
   useEffect(() => {
     setSlot(null);
-    if (!staffId || !selected.length) return setSlots([]);
+    if (!staffId || !selected.length || !date) return setSlots([]);
     const q = new URLSearchParams({ staffId, date, serviceIds: selected.join(",") });
     fetch(`/api/slots?${q}`)
       .then((r) => r.json())
@@ -62,11 +68,13 @@ export default function BookPage() {
     setLoading(false);
     if (!res.ok) {
       setError(data.error);
-      // tải lại slot để thấy khung giờ vừa bị người khác đặt
-      setSlot(null);
-      setDate((d) => d);
-      const q = new URLSearchParams({ staffId, date, serviceIds: selected.join(",") });
-      fetch(`/api/slots?${q}`).then((r) => r.json()).then((d) => setSlots(d.slots ?? []));
+      // Chỉ khi trùng giờ (409) mới bỏ chọn slot và tải lại danh sách;
+      // lỗi nhập liệu (400) giữ nguyên slot để user sửa rồi bấm đặt lại.
+      if (res.status === 409) {
+        setSlot(null);
+        const q = new URLSearchParams({ staffId, date, serviceIds: selected.join(",") });
+        fetch(`/api/slots?${q}`).then((r) => r.json()).then((d) => setSlots(d.slots ?? []));
+      }
       return;
     }
     router.push(`/booking/${data.code}`);
@@ -112,7 +120,7 @@ export default function BookPage() {
               </option>
             ))}
           </select>
-          <input type="date" className={input} min={today()} value={date} onChange={(e) => setDate(e.target.value)} />
+          <input type="date" className={input} min={minDate || undefined} value={date} onChange={(e) => setDate(e.target.value)} />
         </div>
       </section>
 
