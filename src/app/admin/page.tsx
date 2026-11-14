@@ -64,25 +64,25 @@ export default async function AdminPage() {
 
   const stats = isStaff
     ? [
-        { label: "Ca sắp làm (Đã xác nhận)", value: `${count("CONFIRMED")} ca`, icon: Scissors, tone: "bg-blue-50 text-blue-600" },
-        { label: "Đang chờ khách cọc", value: `${count("PENDING")} ca`, icon: Clock, tone: "bg-amber-50 text-amber-600" },
-        { label: "Ca đã hoàn thành", value: `${count("COMPLETED")} ca`, icon: CalendarCheck, tone: "bg-emerald-50 text-emerald-600" },
-        { label: "Tổng lịch của tôi", value: `${bookings.filter((b) => b.status !== "CANCELLED").length} lịch`, icon: TrendingUp, tone: "bg-indigo-50 text-indigo-600" },
+        { label: "Ca sắp làm (Đã xác nhận)", value: `${count("CONFIRMED")} ca`, icon: Scissors, tone: "bg-blue-600 text-white", border: "border-l-blue-600" },
+        { label: "Đang chờ khách cọc", value: `${count("PENDING")} ca`, icon: Clock, tone: "bg-amber-500 text-white", border: "border-l-amber-500" },
+        { label: "Ca đã hoàn thành", value: `${count("COMPLETED")} ca`, icon: CalendarCheck, tone: "bg-emerald-600 text-white", border: "border-l-emerald-600" },
+        { label: "Tổng lịch của tôi", value: `${bookings.filter((b) => b.status !== "CANCELLED").length} lịch`, icon: TrendingUp, tone: "bg-indigo-600 text-white", border: "border-l-indigo-600" },
       ]
     : [
-        { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-50 text-emerald-600" },
-        { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-indigo-50 text-indigo-600" },
-        { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-amber-50 text-amber-600" },
-        { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-blue-50 text-blue-600" },
+        { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-600 text-white", border: "border-l-emerald-600" },
+        { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-indigo-600 text-white", border: "border-l-indigo-600" },
+        { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-amber-500 text-white", border: "border-l-amber-500" },
+        { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-blue-600 text-white", border: "border-l-blue-600" },
       ];
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
       <AdminNav name={session.name} role={session.role} />
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="reveal-up flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
             {isStaff ? `Lịch làm việc của ${session.name}` : "Dashboard quản trị"}
           </h1>
           <p className="text-sm text-slate-600">
@@ -96,7 +96,7 @@ export default async function AdminPage() {
             <form action={resetTestBookings}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                className="btn-interactive inline-flex items-center gap-1.5 rounded-xl border border-red-300 bg-red-50 px-3.5 py-2 text-sm font-bold text-red-700 hover:bg-red-600 hover:text-white"
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 <span>Reset lịch test ({bookings.length})</span>
@@ -105,7 +105,7 @@ export default async function AdminPage() {
           )}
           <Link
             href="/admin/calendar"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="btn-interactive rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 shadow-sm hover:border-indigo-500 hover:text-indigo-700"
           >
             {isStaff ? "Xem lịch tuần của tôi →" : "Xem lịch tuần dạng lưới →"}
           </Link>
@@ -113,17 +113,21 @@ export default async function AdminPage() {
       </div>
 
       {/* KPI */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((st) => {
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((st, idx) => {
           const Icon = st.icon;
+          const delayCls = idx === 1 ? "delay-1" : idx === 2 ? "delay-2" : idx === 3 ? "delay-3" : "";
           return (
-            <div key={st.label} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${st.tone}`}>
+            <div
+              key={st.label}
+              className={`card-interactive reveal-up ${delayCls} flex items-center gap-4 rounded-2xl border border-l-4 border-slate-200/90 ${st.border} bg-white p-4 shadow-md shadow-slate-900/5`}
+            >
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${st.tone}`}>
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-medium text-slate-500">{st.label}</div>
-                <div className="mt-0.5 truncate text-xl font-bold text-slate-900">{st.value}</div>
+                <div className="text-xs font-semibold text-slate-600">{st.label}</div>
+                <div className="mt-0.5 truncate text-xl font-extrabold text-slate-900">{st.value}</div>
               </div>
             </div>
           );
@@ -131,13 +135,13 @@ export default async function AdminPage() {
       </section>
 
       {top.length > 0 && (
-        <section className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-slate-700">
+        <section className="reveal-up delay-1 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm shadow-sm">
+          <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
             <TrendingUp className="h-4 w-4 text-indigo-600" aria-hidden="true" />
             {isStaff ? "Dịch vụ bạn làm nhiều nhất:" : "Dịch vụ phổ biến:"}
           </span>
           {top.map(([n, c]) => (
-            <span key={n} className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+            <span key={n} className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800">
               {n} ({c} lượt)
             </span>
           ))}
@@ -145,7 +149,7 @@ export default async function AdminPage() {
       )}
 
       {bookings.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
+        <div className="reveal-up rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600">
           {isStaff ? (
             <>
               Hiện chưa có khách nào đặt lịch với <b>{session.name}</b>. Hãy thử qua trang{" "}
@@ -168,47 +172,47 @@ export default async function AdminPage() {
 
       <div className="space-y-4">
         {[...byDay.entries()].map(([day, list]) => (
-          <section key={day} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-3">
-              <h2 className="text-sm font-semibold capitalize text-slate-900">{day}</h2>
-              <span className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">
+          <section key={day} className="reveal-up delay-1 overflow-hidden rounded-2xl border border-slate-300/90 bg-white shadow-md shadow-slate-900/5">
+            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-900 px-5 py-3 text-white">
+              <h2 className="text-sm font-bold capitalize text-white">{day}</h2>
+              <span className="rounded-full bg-indigo-500/30 px-3 py-0.5 text-xs font-bold text-indigo-200 ring-1 ring-indigo-400/30">
                 {list.length} ca hẹn
               </span>
             </div>
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-200/80">
               {list.map((b) => (
-                <li key={b.id} className="flex flex-wrap items-center gap-4 px-5 py-4 text-sm transition hover:bg-slate-50/50">
-                  <div className="w-32 shrink-0 rounded-xl bg-indigo-50/70 px-3 py-2 text-center">
-                    <div className="font-mono text-sm font-bold text-indigo-950">
+                <li key={b.id} className="flex flex-wrap items-center gap-4 px-5 py-4 text-sm transition-colors hover:bg-indigo-50/40">
+                  <div className="w-34 shrink-0 rounded-xl bg-slate-900 px-3 py-2 text-center shadow-xs">
+                    <div className="font-mono text-sm font-bold text-white">
                       {fmtTime(b.startTime)} – {fmtTime(b.endTime)}
                     </div>
-                    <div className="font-mono text-[11px] text-indigo-600">#{b.code}</div>
+                    <div className="font-mono text-[11px] font-semibold text-indigo-300">#{b.code}</div>
                   </div>
                   <div className="min-w-52 flex-1 space-y-1.5">
-                    <div className="font-semibold text-slate-900">
-                      Khách: {b.customerName} <span className="font-normal text-slate-500">· {b.customerPhone}</span>
+                    <div className="font-bold text-slate-900">
+                      Khách: {b.customerName} <span className="font-medium text-slate-500">· {b.customerPhone}</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                       {b.items.map((i) => (
-                        <span key={i.id} className="inline-flex items-center gap-1 rounded-lg border border-indigo-100 bg-indigo-50/60 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
-                          <Scissors className="h-3 w-3" aria-hidden="true" />
+                        <span key={i.id} className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-900">
+                          <Scissors className="h-3 w-3 text-indigo-600" aria-hidden="true" />
                           {i.service.name} ({i.duration}p)
                         </span>
                       ))}
                       {!isStaff && (
                         <span className="text-xs text-slate-600">
-                          · Thợ: <b>{b.staff.user.name}</b> · Tổng: <b>{formatVND(b.totalPrice)}</b>
+                          · Thợ: <b className="text-slate-900">{b.staff.user.name}</b> · Tổng: <b className="text-slate-900">{formatVND(b.totalPrice)}</b>
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_COLOR[b.status]}`}>
+                  <span className={`rounded-full border px-3 py-1 text-xs font-bold ${STATUS_COLOR[b.status]}`}>
                     {STATUS_LABEL[b.status]}
                   </span>
                   <div className="flex gap-2">
                     {(NEXT[b.status] ?? []).map((a) => (
                       <form key={a.to} action={updateBookingStatus.bind(null, b.id, a.to)}>
-                        <button type="submit" className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${a.cls}`}>
+                        <button type="submit" className={`btn-interactive rounded-xl border px-3 py-1.5 text-xs font-bold ${a.cls}`}>
                           {a.label}
                         </button>
                       </form>

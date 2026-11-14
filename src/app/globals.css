@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
+  --background: #eef2f6;
   --foreground: #0f172a;
   color-scheme: light;
   accent-color: #4f46e5;
@@ -15,12 +15,16 @@
 }
 
 ::selection {
-  background-color: #e0e7ff;
+  background-color: #c7d2fe;
   color: #1e1b4b;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    radial-gradient(at 12% 0%, rgba(79, 70, 229, 0.09) 0px, transparent 50%),
+    radial-gradient(at 88% 12%, rgba(16, 185, 129, 0.07) 0px, transparent 45%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
@@ -53,4 +57,176 @@ textarea:user-invalid {
 
 input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):user-valid {
   border-color: #16a34a;
+}
+
+/* Hiệu ứng xuất hiện mượt trên compositor (opacity + translate) */
+.reveal-up {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@starting-style {
+  .reveal-up {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+.delay-1 {
+  transition-delay: 60ms;
+}
+
+.delay-2 {
+  transition-delay: 120ms;
+}
+
+.delay-3 {
+  transition-delay: 180ms;
+}
+
+/* Hiệu ứng đóng/mở khung động với @starting-style & allow-discrete */
+.drawer-enter {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  transition:
+    display 0.28s,
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    scale 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+}
+
+@starting-style {
+  .drawer-enter {
+    opacity: 0;
+    translate: 0 -10px;
+    scale: 0.98;
+  }
+}
+
+/* Thẻ & nút có phản hồi tương tác nổi khối / đàn hồi */
+.card-interactive {
+  translate: 0 0;
+  scale: 1;
+  transition:
+    translate 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    scale 0.15s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.card-interactive:hover {
+  translate: 0 -4px;
+  box-shadow: 0 14px 28px -8px rgba(15, 23, 42, 0.14);
+}
+
+.card-interactive:active {
+  translate: 0 -1px;
+  scale: 0.985;
+}
+
+.btn-interactive {
+  translate: 0 0;
+  scale: 1;
+  transition:
+    translate 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    scale 0.12s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.btn-interactive:hover:not(:disabled) {
+  translate: 0 -2px;
+  box-shadow: 0 10px 20px -6px rgba(79, 70, 229, 0.35);
+}
+
+.btn-interactive:active:not(:disabled) {
+  translate: 0 0;
+  scale: 0.96;
+}
+
+.slot-btn {
+  translate: 0 0;
+  scale: 1;
+  transition:
+    translate 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    scale 0.14s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.slot-btn:hover:not(:disabled) {
+  translate: 0 -2px;
+  box-shadow: 0 8px 16px -6px rgba(79, 70, 229, 0.25);
+}
+
+.slot-btn:active:not(:disabled) {
+  scale: 0.96;
+}
+
+.slot-btn[aria-pressed="true"] {
+  scale: 1.02;
+  box-shadow:
+    0 0 0 3px rgba(79, 70, 229, 0.25),
+    0 8px 16px -6px rgba(79, 70, 229, 0.35);
+}
+
+@keyframes floatGlow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-14px, 12px, 0) scale(1.06);
+  }
+}
+
+.float-glow {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .float-glow {
+    animation: floatGlow 9s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-up,
+  .drawer-enter {
+    translate: none;
+    scale: none;
+    transition-duration: 0.1s;
+  }
+
+  @starting-style {
+    .reveal-up,
+    .drawer-enter {
+      translate: none;
+      scale: none;
+    }
+  }
+
+  .card-interactive,
+  .card-interactive:hover,
+  .card-interactive:active,
+  .btn-interactive,
+  .btn-interactive:hover:not(:disabled),
+  .btn-interactive:active:not(:disabled),
+  .slot-btn,
+  .slot-btn:hover:not(:disabled),
+  .slot-btn:active:not(:disabled),
+  .slot-btn[aria-pressed="true"] {
+    translate: none;
+    scale: none;
+  }
 }

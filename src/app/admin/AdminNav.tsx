@@ -23,7 +23,7 @@ export default function AdminNav({ name, role = "ADMIN" }: { name: string; role?
       ];
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+    <header className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 px-4 py-3 text-white shadow-xl shadow-slate-950/15">
       <nav aria-label="Menu quản trị" className="flex flex-wrap items-center gap-1.5 text-sm font-medium">
         {links.map((l) => {
           const active = pathname === l.href;
@@ -32,10 +32,10 @@ export default function AdminNav({ name, role = "ADMIN" }: { name: string; role?
             <Link
               key={l.href}
               href={l.href}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 transition ${
+              className={`btn-interactive inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 ${
                 active
-                  ? "bg-indigo-600 text-white shadow-sm shadow-indigo-200"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-indigo-600 font-semibold text-white shadow-md shadow-indigo-500/35"
+                  : "text-slate-300 hover:bg-white/10 hover:text-white"
               }`}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />
@@ -46,15 +46,17 @@ export default function AdminNav({ name, role = "ADMIN" }: { name: string; role?
       </nav>
       <form action={logout} className="flex items-center gap-2.5 text-sm">
         <span
-          className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
-            isStaff ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-700"
+          className={`rounded-lg px-2.5 py-1 text-xs font-bold ring-1 ${
+            isStaff
+              ? "bg-emerald-500/20 text-emerald-300 ring-emerald-400/40"
+              : "bg-indigo-500/25 text-indigo-200 ring-indigo-400/40"
           }`}
         >
           {isStaff ? `Thợ: ${name}` : `Chủ quán: ${name}`}
         </span>
         <button
           type="submit"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+          className="btn-interactive inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white hover:border-red-400/60 hover:bg-red-500/25 hover:text-red-200"
         >
           <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
           <span>Đăng xuất</span>
