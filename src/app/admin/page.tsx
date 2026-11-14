@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { CalendarCheck, CircleDollarSign, Clock, Scissors, TrendingUp, Wallet } from "lucide-react";
+import { CalendarCheck, CircleDollarSign, Clock, RotateCcw, Scissors, TrendingUp, Wallet } from "lucide-react";
 import { requireStaffOrAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatVND } from "@/lib/format";
-import { updateBookingStatus } from "./actions";
+import { resetTestBookings, updateBookingStatus } from "./actions";
 import AdminNav from "./AdminNav";
 
 export const dynamic = "force-dynamic";
@@ -91,12 +91,25 @@ export default async function AdminPage() {
               : "Theo dõi doanh thu toàn tiệm, trạng thái lịch hẹn của tất cả nhân viên và cập nhật tiến độ phục vụ."}
           </p>
         </div>
-        <Link
-          href="/admin/calendar"
-          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-        >
-          {isStaff ? "Xem lịch tuần của tôi →" : "Xem lịch tuần dạng lưới →"}
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          {bookings.length > 0 && (
+            <form action={resetTestBookings}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                <span>Reset lịch test ({bookings.length})</span>
+              </button>
+            </form>
+          )}
+          <Link
+            href="/admin/calendar"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            {isStaff ? "Xem lịch tuần của tôi →" : "Xem lịch tuần dạng lưới →"}
+          </Link>
+        </div>
       </div>
 
       {/* KPI */}

@@ -29,7 +29,7 @@ async function main() {
         email: s.email,
         passwordHash: hash("staff123"),
         role: "STAFF",
-        staff: { create: { specialty: s.specialty } },
+        staff: { create: { specialty: s.specialty, workDays: "0,1,2,3,4,5,6" } },
       },
     });
   }

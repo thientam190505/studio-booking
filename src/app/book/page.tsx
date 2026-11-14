@@ -244,19 +244,38 @@ export default function BookPage() {
               </div>
             </fieldset>
 
-            <div className="max-w-xs space-y-1.5">
+            <div className="max-w-md space-y-1.5">
               <label htmlFor="book-date" className="block text-sm font-medium text-slate-700">
                 Ngày hẹn
               </label>
-              <input
-                id="book-date"
-                name="date"
-                type="date"
-                className={inputCls}
-                min={minDate || undefined}
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  id="book-date"
+                  name="date"
+                  type="date"
+                  className={inputCls + " max-w-[200px]"}
+                  min={minDate || undefined}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+                {minDate && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const tmr = new Date(new Date(`${minDate}T12:00:00+07:00`).getTime() + 86400_000)
+                        .toISOString()
+                        .slice(0, 10);
+                      setDate(tmr);
+                    }}
+                    className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
+                  >
+                    Chọn ngày mai (đầy đủ 09:00 – 17:30)
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-slate-500">
+                Lưu ý: Nếu chọn hôm nay, các khung giờ đã trôi qua theo đồng hồ thực tế sẽ tự động khóa.
+              </p>
             </div>
           </section>
 

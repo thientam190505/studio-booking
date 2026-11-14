@@ -50,6 +50,16 @@ export async function updateBookingStatus(id: string, status: string) {
   if (status === "CONFIRMED") await sendBookingConfirmation(b.code);
 }
 
+/** Xoá toàn bộ lịch hẹn test để mở lại tất cả slot trống (tiện khi demo/test nhiều lần). */
+export async function resetTestBookings() {
+  await requireStaffOrAdmin();
+  await prisma.bookingItem.deleteMany();
+  await prisma.booking.deleteMany();
+  revalidatePath("/admin");
+  revalidatePath("/admin/calendar");
+  revalidatePath("/book");
+}
+
 // ---------- Dịch vụ (Chỉ ADMIN) ----------
 const serviceSchema = z.object({
   name: z.string().trim().min(2),
