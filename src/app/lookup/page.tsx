@@ -28,7 +28,7 @@ export default function LookupPage() {
   }
 
   const inputCls =
-    "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500";
+    "w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 transition focus:border-amber-800";
 
   return (
     <main className="mx-auto max-w-md px-4 py-12 sm:px-6">
@@ -36,27 +36,27 @@ export default function LookupPage() {
         <form
           onSubmit={submit}
           aria-labelledby="lookup-title"
-          className="reveal-up overflow-hidden rounded-3xl border-2 border-slate-200/90 bg-white shadow-xl shadow-slate-900/10"
+          className="reveal-up overflow-hidden rounded-3xl border border-stone-200/90 bg-white shadow-sm"
         >
-          <div className="border-b border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-6 text-white sm:px-8">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/25 text-indigo-300 ring-1 ring-indigo-400/30">
+          <div className="border-b border-stone-200 bg-[#f5efe6] p-6 text-stone-900 sm:px-8">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-stone-900 text-amber-100">
               <Search className="h-5 w-5" aria-hidden="true" />
             </div>
-            <h1 id="lookup-title" className="pt-3 text-2xl font-extrabold tracking-tight text-white">
+            <h1 id="lookup-title" className="pt-3 text-2xl font-extrabold tracking-tight text-stone-900">
               Tra cứu lịch hẹn
             </h1>
-            <p className="mt-1 text-sm text-slate-300">
-              Nhập đồng thời mã đặt lịch và số điện thoại để xem chi tiết hoặc thanh toán cọc.
+            <p className="mt-1 text-sm text-stone-600">
+              Nhập mã đặt lịch và số điện thoại để xem chi tiết hoặc hoàn tất đặt cọc.
             </p>
           </div>
 
           <div className="space-y-5 p-6 sm:p-8">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="lookup-code" className="block text-sm font-semibold text-slate-800">
+                <label htmlFor="lookup-code" className="block text-sm font-semibold text-stone-800">
                   Mã đặt lịch <span aria-hidden="true" className="text-red-600">*</span>
                 </label>
-                <span id="code-hint" className="block text-xs text-slate-500">
+                <span id="code-hint" className="block text-xs text-stone-500">
                   Ví dụ: BK1A2B3C (không phân biệt chữ hoa/thường)
                 </span>
                 <input
@@ -77,10 +77,10 @@ export default function LookupPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="lookup-phone" className="block text-sm font-semibold text-slate-800">
+                <label htmlFor="lookup-phone" className="block text-sm font-semibold text-stone-800">
                   Số điện thoại đã đặt <span aria-hidden="true" className="text-red-600">*</span>
                 </label>
-                <span id="lookup-phone-hint" className="block text-xs text-slate-500">
+                <span id="lookup-phone-hint" className="block text-xs text-stone-500">
                   Nhập chính xác số điện thoại dùng khi tạo lịch
                 </span>
                 <input
@@ -110,15 +110,15 @@ export default function LookupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-interactive inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50"
+              className="btn-interactive inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-amber-800 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-900 disabled:opacity-50"
             >
               <Search className="h-4 w-4" aria-hidden="true" />
               <span>{loading ? "Đang tìm kiếm..." : "Tra cứu lịch hẹn"}</span>
             </button>
 
-            <p className="text-center text-xs text-slate-600">
+            <p className="text-center text-xs text-stone-600">
               Chưa có lịch hẹn?{" "}
-              <Link href="/book" className="font-bold text-indigo-600 hover:underline">
+              <Link href="/book" className="font-bold text-amber-800 hover:underline">
                 Đặt lịch ngay
               </Link>
             </p>

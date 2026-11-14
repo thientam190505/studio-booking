@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e8eef8;
-  --foreground: #0f172a;
+  --background: #faf7f2;
+  --foreground: #1c1917;
   color-scheme: light;
-  accent-color: #4f46e5;
+  accent-color: #78350f;
 }
 
 @theme inline {
@@ -15,8 +15,8 @@
 }
 
 ::selection {
-  background-color: #c7d2fe;
-  color: #1e1b4b;
+  background-color: #fde68a;
+  color: #1c1917;
 }
 
 body {
@@ -25,25 +25,14 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* Nền đa tầng Ambient Aurora & Lưới kiến trúc cho màn hình rộng */
+/* Nền kem vải lanh ấm áp, dịu mắt cho tiệm salon */
 .bg-ambient-canvas {
   position: fixed;
   inset: 0;
   z-index: -10;
   overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(135deg, #e0e7ff 0%, #eef2ff 30%, #f1f5f9 65%, #dcfce7 100%);
-}
-
-.bg-grid-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(rgba(79, 70, 229, 0.16) 1px, transparent 1px),
-    linear-gradient(to right, rgba(79, 70, 229, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(79, 70, 229, 0.07) 1px, transparent 1px);
-  background-size: 36px 36px;
-  background-position: -0.5px -0.5px, 0 0, 0 0;
+  background: linear-gradient(180deg, #faf7f2 0%, #f5efe6 55%, #faf7f2 100%);
 }
 
 /* Input/select luôn chữ tối, nền trắng (tránh bị chữ trắng khi trình duyệt ở dark mode) */
@@ -51,7 +40,7 @@ input,
 select,
 textarea {
   background-color: #ffffff;
-  color: #0f172a;
+  color: #1c1917;
   font-size: max(1rem, 1em);
 }
 
@@ -60,7 +49,7 @@ select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid #92400e;
   outline-offset: 2px;
 }
 
@@ -139,7 +128,7 @@ input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="
 
 .card-interactive:hover {
   translate: 0 -4px;
-  box-shadow: 0 14px 28px -8px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 14px 28px -10px rgba(28, 25, 23, 0.12);
 }
 
 .card-interactive:active {
@@ -161,7 +150,7 @@ input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="
 
 .btn-interactive:hover:not(:disabled) {
   translate: 0 -2px;
-  box-shadow: 0 10px 20px -6px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 10px 20px -6px rgba(180, 83, 9, 0.22);
 }
 
 .btn-interactive:active:not(:disabled) {
@@ -183,7 +172,7 @@ input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="
 
 .slot-btn:hover:not(:disabled) {
   translate: 0 -2px;
-  box-shadow: 0 8px 16px -6px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 8px 16px -6px rgba(180, 83, 9, 0.2);
 }
 
 .slot-btn:active:not(:disabled) {
@@ -193,8 +182,8 @@ input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="
 .slot-btn[aria-pressed="true"] {
   scale: 1.02;
   box-shadow:
-    0 0 0 3px rgba(79, 70, 229, 0.25),
-    0 8px 16px -6px rgba(79, 70, 229, 0.35);
+    0 0 0 3px rgba(180, 83, 9, 0.22),
+    0 8px 16px -6px rgba(28, 25, 23, 0.25);
 }
 
 @keyframes floatGlow {

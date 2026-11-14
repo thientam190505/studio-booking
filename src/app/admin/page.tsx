@@ -64,16 +64,16 @@ export default async function AdminPage() {
 
   const stats = isStaff
     ? [
-        { label: "Ca sắp làm (Đã xác nhận)", value: `${count("CONFIRMED")} ca`, icon: Scissors, tone: "bg-blue-600 text-white", border: "border-l-blue-600" },
-        { label: "Đang chờ khách cọc", value: `${count("PENDING")} ca`, icon: Clock, tone: "bg-amber-500 text-white", border: "border-l-amber-500" },
-        { label: "Ca đã hoàn thành", value: `${count("COMPLETED")} ca`, icon: CalendarCheck, tone: "bg-emerald-600 text-white", border: "border-l-emerald-600" },
-        { label: "Tổng lịch của tôi", value: `${bookings.filter((b) => b.status !== "CANCELLED").length} lịch`, icon: TrendingUp, tone: "bg-indigo-600 text-white", border: "border-l-indigo-600" },
+        { label: "Ca sắp làm (Đã xác nhận)", value: `${count("CONFIRMED")} ca`, icon: Scissors, tone: "bg-stone-900 text-amber-100", border: "border-l-stone-900" },
+        { label: "Đang chờ khách cọc", value: `${count("PENDING")} ca`, icon: Clock, tone: "bg-amber-700 text-white", border: "border-l-amber-700" },
+        { label: "Ca đã hoàn thành", value: `${count("COMPLETED")} ca`, icon: CalendarCheck, tone: "bg-emerald-700 text-white", border: "border-l-emerald-700" },
+        { label: "Tổng lịch của tôi", value: `${bookings.filter((b) => b.status !== "CANCELLED").length} lịch`, icon: TrendingUp, tone: "bg-amber-900 text-amber-100", border: "border-l-amber-900" },
       ]
     : [
-        { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-600 text-white", border: "border-l-emerald-600" },
-        { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-indigo-600 text-white", border: "border-l-indigo-600" },
-        { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-amber-500 text-white", border: "border-l-amber-500" },
-        { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-blue-600 text-white", border: "border-l-blue-600" },
+        { label: "Doanh thu (hoàn thành)", value: formatVND(revenue), icon: CircleDollarSign, tone: "bg-emerald-700 text-white", border: "border-l-emerald-700" },
+        { label: "Tiền cọc đang giữ", value: formatVND(deposits), icon: Wallet, tone: "bg-amber-800 text-white", border: "border-l-amber-800" },
+        { label: "Chờ cọc / Đã xác nhận", value: `${count("PENDING")} / ${count("CONFIRMED")}`, icon: Clock, tone: "bg-stone-900 text-amber-100", border: "border-l-stone-900" },
+        { label: "Hoàn thành / Đã hủy", value: `${count("COMPLETED")} / ${count("CANCELLED")}`, icon: CalendarCheck, tone: "bg-stone-700 text-white", border: "border-l-stone-700" },
       ];
 
   return (
@@ -82,13 +82,13 @@ export default async function AdminPage() {
 
       <div className="reveal-up flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
-            {isStaff ? `Lịch làm việc của ${session.name}` : "Dashboard quản trị"}
+          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">
+            {isStaff ? `Lịch làm việc của ${session.name}` : "Sổ lịch & quản lý tiệm"}
           </h1>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-stone-600">
             {isStaff
-              ? "Chỉ hiển thị các lịch hẹn khách đã chọn bạn — xem rõ khung giờ, dịch vụ cần thực hiện và cập nhật trạng thái."
-              : "Theo dõi doanh thu toàn tiệm, trạng thái lịch hẹn của tất cả nhân viên và cập nhật tiến độ phục vụ."}
+              ? "Hiển thị các lịch hẹn khách đã đặt riêng với bạn — xem rõ khung giờ, dịch vụ và cập nhật trạng thái."
+              : "Theo dõi doanh thu toàn tiệm, lịch hẹn của các stylist và cập nhật tiến độ phục vụ."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +96,7 @@ export default async function AdminPage() {
             <form action={resetTestBookings}>
               <button
                 type="submit"
-                className="btn-interactive inline-flex items-center gap-1.5 rounded-xl border border-red-300 bg-red-50 px-3.5 py-2 text-sm font-bold text-red-700 hover:bg-red-600 hover:text-white"
+                className="btn-interactive inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-semibold text-red-700 hover:bg-red-600 hover:text-white"
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 <span>Reset lịch test ({bookings.length})</span>
@@ -105,7 +105,7 @@ export default async function AdminPage() {
           )}
           <Link
             href="/admin/calendar"
-            className="btn-interactive rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 shadow-sm hover:border-indigo-500 hover:text-indigo-700"
+            className="btn-interactive rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-2xs hover:border-stone-900 hover:bg-stone-900 hover:text-white"
           >
             {isStaff ? "Xem lịch tuần của tôi →" : "Xem lịch tuần dạng lưới →"}
           </Link>
@@ -120,14 +120,14 @@ export default async function AdminPage() {
           return (
             <div
               key={st.label}
-              className={`card-interactive reveal-up ${delayCls} flex items-center gap-4 rounded-2xl border border-l-4 border-slate-200/90 ${st.border} bg-white p-4 shadow-md shadow-slate-900/5`}
+              className={`card-interactive reveal-up ${delayCls} flex items-center gap-4 rounded-2xl border border-l-4 border-stone-200/90 ${st.border} bg-white p-4 shadow-xs`}
             >
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm ${st.tone}`}>
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${st.tone}`}>
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs font-semibold text-slate-600">{st.label}</div>
-                <div className="mt-0.5 truncate text-xl font-extrabold text-slate-900">{st.value}</div>
+                <div className="text-xs font-medium text-stone-500">{st.label}</div>
+                <div className="mt-0.5 truncate text-xl font-extrabold text-stone-900">{st.value}</div>
               </div>
             </div>
           );
@@ -135,13 +135,13 @@ export default async function AdminPage() {
       </section>
 
       {top.length > 0 && (
-        <section className="reveal-up delay-1 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200/90 bg-white px-4 py-3 text-sm shadow-sm">
-          <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
-            <TrendingUp className="h-4 w-4 text-indigo-600" aria-hidden="true" />
-            {isStaff ? "Dịch vụ bạn làm nhiều nhất:" : "Dịch vụ phổ biến:"}
+        <section className="reveal-up delay-1 flex flex-wrap items-center gap-2 rounded-2xl border border-stone-200/90 bg-white px-4 py-3 text-sm shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-stone-800">
+            <TrendingUp className="h-4 w-4 text-amber-800" aria-hidden="true" />
+            {isStaff ? "Dịch vụ bạn làm nhiều nhất:" : "Dịch vụ được đặt nhiều:"}
           </span>
           {top.map(([n, c]) => (
-            <span key={n} className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800">
+            <span key={n} className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
               {n} ({c} lượt)
             </span>
           ))}
@@ -149,19 +149,19 @@ export default async function AdminPage() {
       )}
 
       {bookings.length === 0 && (
-        <div className="reveal-up rounded-2xl border-2 border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600">
+        <div className="reveal-up rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center text-sm text-stone-600">
           {isStaff ? (
             <>
               Hiện chưa có khách nào đặt lịch với <b>{session.name}</b>. Hãy thử qua trang{" "}
-              <Link href="/book" className="font-semibold text-indigo-600 underline">
+              <Link href="/book" className="font-semibold text-amber-800 underline">
                 Đặt lịch
               </Link>{" "}
-              và chọn chuyên viên <b>{session.name}</b> để kiểm tra!
+              và chọn stylist <b>{session.name}</b> để kiểm tra!
             </>
           ) : (
             <>
               Chưa có lịch hẹn nào trong hệ thống. Hãy thử{" "}
-              <Link href="/book" className="font-semibold text-indigo-600 underline">
+              <Link href="/book" className="font-semibold text-amber-800 underline">
                 đặt một lịch mẫu
               </Link>{" "}
               để kiểm tra!
@@ -172,36 +172,36 @@ export default async function AdminPage() {
 
       <div className="space-y-4">
         {[...byDay.entries()].map(([day, list]) => (
-          <section key={day} className="reveal-up delay-1 overflow-hidden rounded-2xl border border-slate-300/90 bg-white shadow-md shadow-slate-900/5">
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-900 px-5 py-3 text-white">
-              <h2 className="text-sm font-bold capitalize text-white">{day}</h2>
-              <span className="rounded-full bg-indigo-500/30 px-3 py-0.5 text-xs font-bold text-indigo-200 ring-1 ring-indigo-400/30">
+          <section key={day} className="reveal-up delay-1 overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-xs">
+            <div className="flex items-center justify-between border-b border-stone-200 bg-[#f5efe6] px-5 py-3 text-stone-900">
+              <h2 className="text-sm font-bold capitalize text-stone-900">{day}</h2>
+              <span className="rounded-full bg-stone-900 px-3 py-0.5 text-xs font-semibold text-white">
                 {list.length} ca hẹn
               </span>
             </div>
-            <ul className="divide-y divide-slate-200/80">
+            <ul className="divide-y divide-stone-100">
               {list.map((b) => (
-                <li key={b.id} className="flex flex-wrap items-center gap-4 px-5 py-4 text-sm transition-colors hover:bg-indigo-50/40">
-                  <div className="w-34 shrink-0 rounded-xl bg-slate-900 px-3 py-2 text-center shadow-xs">
-                    <div className="font-mono text-sm font-bold text-white">
+                <li key={b.id} className="flex flex-wrap items-center gap-4 px-5 py-4 text-sm transition-colors hover:bg-[#faf7f2]">
+                  <div className="w-34 shrink-0 rounded-xl border border-stone-200 bg-[#f5efe6] px-3 py-2 text-center">
+                    <div className="font-mono text-sm font-bold text-stone-900">
                       {fmtTime(b.startTime)} – {fmtTime(b.endTime)}
                     </div>
-                    <div className="font-mono text-[11px] font-semibold text-indigo-300">#{b.code}</div>
+                    <div className="font-mono text-[11px] font-semibold text-amber-800">#{b.code}</div>
                   </div>
                   <div className="min-w-52 flex-1 space-y-1.5">
-                    <div className="font-bold text-slate-900">
-                      Khách: {b.customerName} <span className="font-medium text-slate-500">· {b.customerPhone}</span>
+                    <div className="font-bold text-stone-900">
+                      Khách: {b.customerName} <span className="font-normal text-stone-500">· {b.customerPhone}</span>
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                       {b.items.map((i) => (
-                        <span key={i.id} className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-900">
-                          <Scissors className="h-3 w-3 text-indigo-600" aria-hidden="true" />
+                        <span key={i.id} className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-800">
+                          <Scissors className="h-3 w-3 text-amber-800" aria-hidden="true" />
                           {i.service.name} ({i.duration}p)
                         </span>
                       ))}
                       {!isStaff && (
-                        <span className="text-xs text-slate-600">
-                          · Thợ: <b className="text-slate-900">{b.staff.user.name}</b> · Tổng: <b className="text-slate-900">{formatVND(b.totalPrice)}</b>
+                        <span className="text-xs text-stone-600">
+                          · Stylist: <b className="text-stone-900">{b.staff.user.name}</b> · Tổng: <b className="text-stone-900">{formatVND(b.totalPrice)}</b>
                         </span>
                       )}
                     </div>
@@ -212,7 +212,7 @@ export default async function AdminPage() {
                   <div className="flex gap-2">
                     {(NEXT[b.status] ?? []).map((a) => (
                       <form key={a.to} action={updateBookingStatus.bind(null, b.id, a.to)}>
-                        <button type="submit" className={`btn-interactive rounded-xl border px-3 py-1.5 text-xs font-bold ${a.cls}`}>
+                        <button type="submit" className={`btn-interactive rounded-full border px-3.5 py-1.5 text-xs font-semibold ${a.cls}`}>
                           {a.label}
                         </button>
                       </form>

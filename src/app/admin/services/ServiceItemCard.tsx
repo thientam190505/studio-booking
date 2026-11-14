@@ -29,21 +29,21 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
 
   const isPaused = Boolean(service.unavailableReason);
   const inputCls =
-    "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500";
+    "w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-800";
 
   return (
-    <li className="p-5 transition-colors hover:bg-indigo-50/35">
+    <li className="p-5 transition-colors hover:bg-[#faf7f2]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className={`min-w-52 flex-1 space-y-1.5 ${service.active ? "" : "opacity-55"}`}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-base font-bold text-slate-900 ${service.active ? "" : "line-through"}`}>
+            <span className={`text-base font-bold text-stone-900 ${service.active ? "" : "line-through"}`}>
               {service.name}
             </span>
-            <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
+            <span className="rounded-full border border-stone-200 bg-stone-100 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">
               {service.category}
             </span>
             {!service.active ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-stone-200 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">
                 <EyeOff className="h-3 w-3" aria-hidden="true" />
                 Đang ẩn khỏi Menu
               </span>
@@ -53,21 +53,21 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
                 Tạm ngưng: {service.unavailableReason}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
                 <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                 Đang mở bán
               </span>
             )}
           </div>
-          {service.description && <p className="text-xs text-slate-600">{service.description}</p>}
+          {service.description && <p className="text-xs text-stone-600">{service.description}</p>}
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-xs font-semibold text-white">
-            <Clock className="h-3.5 w-3.5 text-indigo-300" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold text-stone-700">
+            <Clock className="h-3.5 w-3.5 text-stone-500" aria-hidden="true" />
             {service.durationMinutes} phút
           </span>
-          <span className="min-w-24 text-right text-sm font-extrabold text-indigo-700">{formatVND(service.price)}</span>
+          <span className="min-w-24 text-right text-sm font-extrabold text-stone-900">{formatVND(service.price)}</span>
 
           {isPaused ? (
             <form action={setServiceUnavailable}>
@@ -75,7 +75,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
               <input type="hidden" name="reason" value="" />
               <button
                 type="submit"
-                className="btn-interactive inline-flex items-center gap-1 rounded-xl border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
+                className="btn-interactive inline-flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-800"
               >
                 <PlayCircle className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Mở bán lại</span>
@@ -85,9 +85,9 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
             <button
               type="button"
               onClick={() => setMode(mode === "pause" ? "view" : "pause")}
-              className={`btn-interactive inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-bold ${
+              className={`btn-interactive inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-bold ${
                 mode === "pause"
-                  ? "border-amber-600 bg-amber-500 text-white shadow-sm"
+                  ? "border-amber-700 bg-amber-700 text-white shadow-2xs"
                   : "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
               }`}
             >
@@ -99,10 +99,10 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
           <button
             type="button"
             onClick={() => setMode(mode === "edit" ? "view" : "edit")}
-            className={`btn-interactive inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-xs font-bold ${
+            className={`btn-interactive inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-bold ${
               mode === "edit"
-                ? "border-indigo-600 bg-indigo-600 text-white shadow-sm"
-                : "border-slate-300 bg-white text-slate-800 hover:border-indigo-500"
+                ? "border-stone-900 bg-stone-900 text-white shadow-2xs"
+                : "border-stone-300 bg-white text-stone-800 hover:border-stone-900"
             }`}
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
@@ -112,7 +112,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
           <form action={toggleService.bind(null, service.id)}>
             <button
               type="submit"
-              className="btn-interactive inline-flex items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:bg-slate-100"
+              className="btn-interactive inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-xs font-bold text-stone-800 hover:bg-stone-100"
             >
               {service.active ? (
                 <>
@@ -132,7 +132,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
             <button
               type="submit"
               aria-label={`Xóa dịch vụ ${service.name}`}
-              className="btn-interactive inline-flex items-center gap-1 rounded-xl border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-bold text-red-600 hover:border-red-300 hover:bg-red-50"
+              className="btn-interactive inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-bold text-red-600 hover:border-red-300 hover:bg-red-50"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
@@ -145,7 +145,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
         <form
           action={setServiceUnavailable}
           onSubmit={() => setMode("view")}
-          className="drawer-enter mt-4 space-y-3 rounded-2xl border-2 border-amber-300 bg-amber-50/80 p-4 text-sm shadow-sm"
+          className="drawer-enter mt-4 space-y-3 rounded-2xl border border-amber-300 bg-amber-50/80 p-4 text-sm shadow-2xs"
         >
           <input type="hidden" name="id" value={service.id} />
           <div className="space-y-1.5">
@@ -160,7 +160,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
                   onClick={() => setReason(preset)}
                   className={`rounded-full border px-2.5 py-1 text-xs font-semibold transition ${
                     reason === preset
-                      ? "border-amber-600 bg-amber-500 text-white shadow-xs"
+                      ? "border-amber-700 bg-amber-700 text-white shadow-2xs"
                       : "border-amber-300 bg-white text-amber-900 hover:bg-amber-100"
                   }`}
                 >
@@ -181,14 +181,14 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              className="btn-interactive rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700"
+              className="btn-interactive rounded-full bg-amber-800 px-4 py-2 text-xs font-bold text-white hover:bg-amber-900"
             >
               Xác nhận tạm ngưng món này
             </button>
             <button
               type="button"
               onClick={() => setMode("view")}
-              className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-full border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
             >
               Đóng
             </button>
@@ -201,18 +201,18 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
         <form
           action={updateService}
           onSubmit={() => setMode("view")}
-          className="drawer-enter mt-4 space-y-3 rounded-2xl border-2 border-indigo-300 bg-indigo-50/50 p-4 text-sm shadow-sm"
+          className="drawer-enter mt-4 space-y-3 rounded-2xl border border-stone-300 bg-[#faf7f2] p-4 text-sm shadow-2xs"
         >
           <input type="hidden" name="id" value={service.id} />
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="space-y-1 sm:col-span-2">
-              <label htmlFor={`edit-name-${service.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`edit-name-${service.id}`} className="block text-xs font-semibold text-stone-700">
                 Tên dịch vụ <span aria-hidden="true" className="text-red-600">*</span>
               </label>
               <input id={`edit-name-${service.id}`} name="name" required defaultValue={service.name} className={inputCls} />
             </div>
             <div className="space-y-1">
-              <label htmlFor={`edit-cat-${service.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`edit-cat-${service.id}`} className="block text-xs font-semibold text-stone-700">
                 Nhóm Menu <span aria-hidden="true" className="text-red-600">*</span>
               </label>
               <input
@@ -225,7 +225,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor={`edit-price-${service.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`edit-price-${service.id}`} className="block text-xs font-semibold text-stone-700">
                 Giá (VND) <span aria-hidden="true" className="text-red-600">*</span>
               </label>
               <input
@@ -240,7 +240,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor={`edit-dur-${service.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`edit-dur-${service.id}`} className="block text-xs font-semibold text-stone-700">
                 Thời lượng (phút) <span aria-hidden="true" className="text-red-600">*</span>
               </label>
               <input
@@ -256,7 +256,7 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
               />
             </div>
             <div className="space-y-1 sm:col-span-3">
-              <label htmlFor={`edit-desc-${service.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`edit-desc-${service.id}`} className="block text-xs font-semibold text-stone-700">
                 Mô tả ngắn
               </label>
               <input id={`edit-desc-${service.id}`} name="description" defaultValue={service.description} className={inputCls} />
@@ -265,14 +265,14 @@ export default function ServiceItemCard({ service }: { service: AdminServiceItem
           <div className="flex items-center gap-2">
             <button
               type="submit"
-              className="btn-interactive rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700"
+              className="btn-interactive rounded-full bg-stone-900 px-4 py-2 text-xs font-bold text-white hover:bg-amber-800"
             >
               Lưu thay đổi
             </button>
             <button
               type="button"
               onClick={() => setMode("view")}
-              className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              className="rounded-full border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
             >
               Hủy
             </button>

@@ -26,36 +26,33 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="vi"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="relative flex min-h-full flex-col text-slate-900">
-        {/* Lớp nền Ambient Aurora & Lưới kiến trúc cố định */}
+      <body className="relative flex min-h-full flex-col text-stone-900">
+        {/* Lớp nền nắng ấm dịu nhẹ */}
         <div aria-hidden="true" className="bg-ambient-canvas">
-          <div className="bg-grid-pattern" />
-          <div className="float-glow absolute -top-32 -left-24 h-[460px] w-[460px] rounded-full bg-indigo-500/20 blur-3xl" />
-          <div className="float-glow absolute top-1/3 -right-28 h-[420px] w-[420px] rounded-full bg-violet-500/20 blur-3xl" />
-          <div className="absolute -bottom-32 left-1/4 h-[380px] w-[380px] rounded-full bg-sky-400/20 blur-3xl" />
-          <div className="absolute right-1/5 -bottom-24 h-[360px] w-[360px] rounded-full bg-emerald-400/15 blur-3xl" />
+          <div className="float-glow absolute -top-28 -left-24 h-[420px] w-[420px] rounded-full bg-amber-200/25 blur-3xl" />
+          <div className="float-glow absolute top-1/3 -right-24 h-[380px] w-[380px] rounded-full bg-orange-100/30 blur-3xl" />
         </div>
 
         <SiteHeader />
         <div className="flex-1">{children}</div>
 
         {/* Thanh thông tin & liên hệ cá nhân (Footer Bar) */}
-        <footer className="mt-12 border-t-2 border-sky-500/70 bg-[#050b18] text-slate-200 shadow-[0_-4px_25px_rgba(14,165,233,0.18)]">
+        <footer className="mt-14 border-t-2 border-amber-500/40 bg-[#141210] text-stone-200 shadow-[0_-4px_24px_rgba(28,25,23,0.12)]">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sky-400/60 bg-gradient-to-br from-indigo-500 to-sky-500 text-xs font-extrabold text-white shadow-sm shadow-sky-500/30">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-400/50 bg-gradient-to-br from-amber-700 to-amber-500 text-xs font-extrabold text-white shadow-sm">
                 TT
               </span>
               <div className="space-y-0.5">
-                <div className="font-medium text-slate-200">
+                <div className="font-medium text-stone-200">
                   © 2026 Studio Booking. Thực hiện bởi <span className="font-bold text-white">Thiện Tâm</span>.
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                  <Link href="/book" className="transition-colors hover:text-sky-400">Đặt lịch</Link>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-stone-400">
+                  <Link href="/book" className="transition-colors hover:text-amber-300">Đặt lịch</Link>
                   <span aria-hidden="true">·</span>
-                  <Link href="/lookup" className="transition-colors hover:text-sky-400">Tra cứu lịch</Link>
+                  <Link href="/lookup" className="transition-colors hover:text-amber-300">Tra cứu lịch</Link>
                   <span aria-hidden="true">·</span>
-                  <Link href="/admin" className="transition-colors hover:text-sky-400">Trang quản trị</Link>
+                  <Link href="/admin" className="transition-colors hover:text-amber-300">Trang quản trị</Link>
                 </div>
               </div>
             </div>
@@ -66,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href="https://www.facebook.com/tem.thien.5?locale=vi_VN"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-sky-400/60 bg-[#0a1329] px-4 py-1.5 text-xs font-semibold text-white hover:border-sky-400 hover:bg-sky-500/15"
+                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-stone-700 bg-[#1e1a16] px-4 py-1.5 text-xs font-semibold text-white hover:border-sky-400/70 hover:bg-sky-500/15"
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1877F2] text-white" aria-hidden="true">
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
@@ -81,7 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href="https://www.tiktok.com/@tam190505"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-sky-400/60 bg-[#0a1329] px-4 py-1.5 text-xs font-semibold text-white hover:border-pink-400 hover:bg-pink-500/15"
+                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-stone-700 bg-[#1e1a16] px-4 py-1.5 text-xs font-semibold text-white hover:border-pink-400/70 hover:bg-pink-500/15"
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-md border border-white/15 bg-black" aria-hidden="true">
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5">
@@ -107,7 +104,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               {/* Gmail */}
               <a
                 href="mailto:thientam190505@gmail.com"
-                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-sky-400/60 bg-[#0a1329] px-4 py-1.5 text-xs font-semibold text-white hover:border-red-400 hover:bg-red-500/15"
+                className="btn-interactive inline-flex items-center gap-2 rounded-full border border-stone-700 bg-[#1e1a16] px-4 py-1.5 text-xs font-semibold text-white hover:border-amber-400/70 hover:bg-amber-500/15"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" aria-hidden="true">
                   <path fill="#4285F4" d="M2 6.5v11c0 .83.67 1.5 1.5 1.5H6V9.7L2 6.5z" />
@@ -121,7 +118,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
               {/* SĐT */}
               <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-bold tracking-wide text-white">
-                <Phone className="h-3.5 w-3.5 text-pink-500" aria-hidden="true" />
+                <Phone className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
                 <span>0328 xxx 660</span>
               </span>
             </div>
