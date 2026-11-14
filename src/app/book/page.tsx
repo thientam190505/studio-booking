@@ -20,11 +20,12 @@ export default function BookPage() {
   const [date, setDate] = useState("");
   const [minDate, setMinDate] = useState("");
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cần giờ client, không thể tính lúc prerender
     setMinDate(today());
     setDate(today());
   }, []);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [slot, setSlot] = useState<Slot | null>(null);
+  const [slotStart, setSlotStart] = useState("");
   const [form, setForm] = useState({ customerName: "", customerPhone: "", customerEmail: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,14 +43,20 @@ export default function BookPage() {
   const total = chosen.reduce((s, x) => s + x.price, 0);
   const duration = chosen.reduce((s, x) => s + x.durationMinutes, 0);
 
+  const ready = Boolean(staffId && selected.length && date);
+  const [reloadKey, setReloadKey] = useState(0);
+
   useEffect(() => {
-    setSlot(null);
-    if (!staffId || !selected.length || !date) return setSlots([]);
+    if (!ready) return;
     const q = new URLSearchParams({ staffId, date, serviceIds: selected.join(",") });
     fetch(`/api/slots?${q}`)
       .then((r) => r.json())
       .then((d) => setSlots(d.slots ?? []));
-  }, [staffId, date, selected]);
+  }, [ready, staffId, date, selected, reloadKey]);
+
+  // Slot đang chọn chỉ hợp lệ khi vẫn còn trống trong danh sách mới nhất
+  const visibleSlots = ready ? slots : [];
+  const slot = visibleSlots.find((s) => s.start === slotStart && s.available) ?? null;
 
   const toggle = (id: string) =>
     setSelected((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -71,9 +78,8 @@ export default function BookPage() {
       // Chỉ khi trùng giờ (409) mới bỏ chọn slot và tải lại danh sách;
       // lỗi nhập liệu (400) giữ nguyên slot để user sửa rồi bấm đặt lại.
       if (res.status === 409) {
-        setSlot(null);
-        const q = new URLSearchParams({ staffId, date, serviceIds: selected.join(",") });
-        fetch(`/api/slots?${q}`).then((r) => r.json()).then((d) => setSlots(d.slots ?? []));
+        setSlotStart("");
+        setReloadKey((k) => k + 1);
       }
       return;
     }
@@ -128,16 +134,16 @@ export default function BookPage() {
         <h2 className="mb-3 font-semibold">3. Chọn giờ {duration ? `(${duration} phút)` : ""}</h2>
         {!staffId || !selected.length ? (
           <p className="text-sm text-zinc-500">Hãy chọn dịch vụ và nhân viên trước.</p>
-        ) : slots.length === 0 ? (
+        ) : visibleSlots.length === 0 ? (
           <p className="text-sm text-zinc-500">Nhân viên không làm việc vào ngày này.</p>
         ) : (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-            {slots.map((s) => (
+            {visibleSlots.map((s) => (
               <button
                 key={s.start}
                 type="button"
                 disabled={!s.available}
-                onClick={() => setSlot(s)}
+                onClick={() => setSlotStart(s.start)}
                 className={`rounded-lg border py-2 text-sm transition ${
                   slot?.start === s.start
                     ? "border-indigo-600 bg-indigo-600 text-white"
