@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendBookingConfirmation } from "@/lib/email";
 
 /**
  * Mô phỏng webhook của cổng thanh toán: khi nhận được thanh toán thành công
@@ -21,5 +22,6 @@ export async function POST(_: Request, { params }: { params: Promise<{ code: str
     where: { code },
     data: { status: "CONFIRMED", holdExpiresAt: null },
   });
+  await sendBookingConfirmation(code);
   return NextResponse.json({ status: "CONFIRMED" });
 }

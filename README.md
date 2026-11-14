@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Studio Booking – Hệ thống đặt lịch dịch vụ
 
-## Getting Started
+Web fullstack đặt lịch hẹn (salon/studio/phòng khám): khách chọn dịch vụ → nhân viên → khung giờ trống theo thời gian thực, cọc online (mô phỏng), admin quản lý lịch, ca làm và doanh thu.
 
-First, run the development server:
+> **Live demo:** _(thêm link Vercel sau khi deploy)_ · **Admin demo:** `admin@demo.com` / `admin123`
+
+## Điểm kỹ thuật nổi bật
+
+| Bài toán | Cách giải quyết |
+| --- | --- |
+| **Trùng lịch** | Kiểm tra giao khoảng `start < otherEnd && end > otherStart` ngay trong **transaction** cùng lúc tạo booking ([`src/lib/booking.ts`](src/lib/booking.ts)). |
+| **Race condition** | 3 request đặt cùng 1 slot song song → đúng 1 thành công (`npm run test:race`). |
+| **Giữ chỗ** | Booking `PENDING` giữ slot 10 phút, hết hạn tự nhả slot; chỉ `CONFIRMED` mới khóa vĩnh viễn. |
+| **Thanh toán / Webhook** | Endpoint `/api/bookings/[code]/pay` mô phỏng webhook cổng thanh toán: `PENDING → CONFIRMED` và gửi email. Dễ thay bằng PayOS/Stripe thật. |
+| **Phân quyền (RBAC)** | Session cookie `httpOnly` ký HMAC-SHA256; mọi trang & server action admin đều kiểm tra role phía server. |
+| **Múi giờ** | Cố định `UTC+7` cho cửa hàng, nên slot không lệch khi deploy trên server UTC. |
+| **State machine** | Admin chỉ đổi trạng thái hợp lệ: chờ cọc → xác nhận → hoàn thành / hủy. |
+
+## Tính năng
+
+**Khách:** chọn nhiều dịch vụ (tự cộng thời lượng) · chọn nhân viên · lịch giờ trống (giờ đã đặt bị mờ) · cọc 20% · email xác nhận · tra cứu lịch bằng mã + SĐT.
+
+**Admin (`/admin`):** dashboard doanh thu/tiền cọc/dịch vụ hot · danh sách lịch theo ngày + đổi trạng thái · **lịch tuần dạng lưới** (lọc theo nhân viên) · CRUD dịch vụ (ẩn/hiện) · giờ làm & ngày nghỉ của nhân viên.
+
+## Tech stack
+
+Next.js (App Router) · TypeScript · TailwindCSS · Prisma ORM · SQLite (dev) · Zod · Nodemailer · bcryptjs
+
+## Chạy local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env     # Windows: copy .env.example .env
+npx prisma db push       # tạo dev.db
+npm run seed             # dữ liệu mẫu + tài khoản admin
+npm run dev              # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Script | Mô tả |
+| --- | --- |
+| `npm test` | Unit test (overlap, múi giờ, token) |
+| `npm run test:race` | Test đặt trùng song song |
+| `npm run smoke:admin` | Smoke test phân quyền các trang admin (cần dev server đang chạy) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cấu trúc
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+prisma/            schema + seed
+src/lib/           availability (thuật toán slot), booking (transaction), auth, email
+src/app/api/       catalog, slots, bookings, lookup
+src/app/book       luồng đặt lịch của khách
+src/app/admin/     dashboard, calendar, services, staff
+tests/ scripts/    unit test, race test, smoke test
+```
 
-## Learn More
+## Deploy (Vercel)
 
-To learn more about Next.js, take a look at the following resources:
+SQLite là file nên **không bền trên Vercel**. Khi deploy: tạo Postgres miễn phí (Neon/Supabase), đổi `provider = "postgresql"` trong `prisma/schema.prisma`, đặt `DATABASE_URL`, `AUTH_SECRET` trong Environment Variables rồi `prisma db push` + `npm run seed`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Hướng phát triển
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tích hợp PayOS/Stripe thật với kiểm tra chữ ký webhook · rate limit endpoint đặt lịch · tự chọn "bất kỳ nhân viên rảnh" · nhắc lịch qua email trước giờ hẹn.

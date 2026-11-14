@@ -1,7 +1,8 @@
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatVND } from "@/lib/format";
-import { logout, updateBookingStatus } from "./actions";
+import { updateBookingStatus } from "./actions";
+import AdminNav from "./AdminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -59,13 +60,8 @@ export default async function AdminPage() {
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard quản trị</h1>
-        <form action={logout} className="flex items-center gap-3 text-sm">
-          <span className="text-zinc-500">{session.name}</span>
-          <button className="rounded-lg border border-zinc-300 px-3 py-1.5">Đăng xuất</button>
-        </form>
-      </header>
+      <AdminNav name={session.name} />
+      <h1 className="text-2xl font-bold">Dashboard quản trị</h1>
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {stat("Doanh thu (hoàn thành)", formatVND(revenue))}

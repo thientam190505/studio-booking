@@ -7,6 +7,7 @@ export default function Home() {
       <p className="text-lg text-zinc-600">Đặt lịch nhanh, chọn nhân viên và khung giờ trống theo thời gian thực.</p>
       <div className="flex gap-3">
         <Link href="/book" className="rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white">Đặt lịch ngay</Link>
+        <Link href="/lookup" className="rounded-lg border border-zinc-300 px-6 py-3 font-medium">Tra cứu lịch</Link>
         <Link href="/admin" className="rounded-lg border border-zinc-300 px-6 py-3 font-medium">Quản trị</Link>
       </div>
     </main>

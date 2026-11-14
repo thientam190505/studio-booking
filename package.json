@@ -9,7 +9,9 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push",
-    "test:race": "tsx scripts/race-test.ts"
+    "test:race": "tsx scripts/race-test.ts",
+    "test": "tsx --test tests/unit.test.ts",
+    "smoke:admin": "tsx --env-file=.env scripts/smoke-admin.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -18,6 +20,7 @@
     "date-fns": "^4.4.0",
     "lucide-react": "^1.73.0",
     "next": "16.4.6",
+    "nodemailer": "^10.5.0",
     "prisma": "^6.19.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -28,6 +31,7 @@
     "@tailwindcss/turbopack": "4.3.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
