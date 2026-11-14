@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <div className="font-medium text-stone-200">
                   © 2026 Studio Booking. Thực hiện bởi <span className="font-bold text-white">Thiện Tâm</span>.
                 </div>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-stone-400">
+                <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-stone-300">
                   <Link href="/book" className="transition-colors hover:text-amber-300">Đặt lịch</Link>
                   <span aria-hidden="true">·</span>
                   <Link href="/lookup" className="transition-colors hover:text-amber-300">Tra cứu lịch</Link>

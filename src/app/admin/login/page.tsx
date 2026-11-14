@@ -18,23 +18,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
   const inputCls =
-    "w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 transition focus:border-amber-800";
+    "w-full rounded-xl border-2 border-stone-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-stone-950 placeholder:font-normal placeholder:text-stone-500 transition focus:border-amber-800";
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-140px)] max-w-md flex-col justify-center px-4 py-10 sm:px-6">
       <form
         action={action}
         aria-labelledby="admin-login-heading"
-        className="reveal-up overflow-hidden rounded-3xl border border-stone-200/90 bg-white shadow-sm"
+        className="reveal-up overflow-hidden rounded-3xl border-2 border-stone-300 bg-white shadow-sm"
       >
-        <div className="border-b border-stone-200 bg-[#f5efe6] p-6 text-stone-900 sm:px-8">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-stone-900 text-amber-100">
+        <div className="border-b-2 border-stone-300 bg-[#e9dfd0] p-6 text-stone-950 sm:px-8">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-stone-900 text-amber-200">
             <ShieldCheck className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h1 id="admin-login-heading" className="pt-3 text-2xl font-extrabold tracking-tight text-stone-900">
+          <h1 id="admin-login-heading" className="pt-3 text-2xl font-extrabold tracking-tight text-stone-950">
             Đăng nhập Quản trị & Stylist
           </h1>
-          <p className="mt-1 text-sm text-stone-600">
+          <p className="mt-1 text-sm font-medium text-stone-800">
             Chủ tiệm xem toàn bộ sổ lịch; mỗi stylist đăng nhập để xem lịch hẹn riêng của mình.
           </p>
         </div>
@@ -42,8 +42,8 @@ export default function LoginPage() {
         <div className="space-y-5 p-6 sm:p-8">
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="admin-email" className="block text-sm font-semibold text-stone-800">
-                Email tài khoản <span aria-hidden="true" className="text-red-600">*</span>
+              <label htmlFor="admin-email" className="block text-sm font-bold text-stone-900">
+                Email tài khoản <span aria-hidden="true" className="text-red-700">*</span>
               </label>
               <input
                 id="admin-email"
@@ -62,8 +62,8 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="admin-password" className="block text-sm font-semibold text-stone-800">
-                Mật khẩu <span aria-hidden="true" className="text-red-600">*</span>
+              <label htmlFor="admin-password" className="block text-sm font-bold text-stone-900">
+                Mật khẩu <span aria-hidden="true" className="text-red-700">*</span>
               </label>
               <div className="relative">
                 <input
@@ -83,7 +83,7 @@ export default function LoginPage() {
                   aria-pressed={showPassword}
                   aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-1 flex items-center rounded-lg px-2.5 text-stone-500 transition-colors hover:text-stone-900"
+                  className="absolute inset-y-0 right-1 flex items-center rounded-lg px-2.5 text-stone-700 transition-colors hover:text-stone-950"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                 </button>
@@ -92,7 +92,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div role="alert" aria-live="polite" className="drawer-enter flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-medium text-red-700">
+            <div role="alert" aria-live="polite" className="drawer-enter flex items-center gap-2 rounded-xl border-2 border-red-400 bg-red-50 p-3 text-sm font-semibold text-red-800">
               <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </div>
@@ -107,8 +107,8 @@ export default function LoginPage() {
             <span>{pending ? "Đang xác thực..." : "Đăng nhập"}</span>
           </button>
 
-          <div className="space-y-2.5 rounded-2xl border border-stone-200 bg-[#faf7f2] p-3.5 text-xs">
-            <div className="flex items-center gap-1.5 font-bold text-stone-800">
+          <div className="space-y-2.5 rounded-2xl border-2 border-stone-300 bg-[#faf6ef] p-3.5 text-xs">
+            <div className="flex items-center gap-1.5 font-extrabold text-stone-950">
               <UserCheck className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" />
               <span>Chọn nhanh tài khoản Demo (1-click):</span>
             </div>
@@ -123,14 +123,14 @@ export default function LoginPage() {
                       setEmail(acc.email);
                       setPassword(acc.pass);
                     }}
-                    className={`card-interactive flex flex-col items-start rounded-xl border p-2.5 text-left ${
+                    className={`card-interactive flex flex-col items-start rounded-xl border-2 p-2.5 text-left ${
                       selected
-                        ? "border-stone-900 bg-stone-900 text-white shadow-2xs"
-                        : "border-stone-200 bg-white text-stone-800 hover:border-stone-400"
+                        ? "border-stone-950 bg-stone-900 text-white shadow-2xs"
+                        : "border-stone-300 bg-white text-stone-950 hover:border-stone-900"
                     }`}
                   >
-                    <span className="font-bold">{acc.label}</span>
-                    <span className={`text-[11px] font-medium ${selected ? "text-amber-200" : "text-stone-500"}`}>{acc.badge}</span>
+                    <span className="font-extrabold">{acc.label}</span>
+                    <span className={`text-[11px] font-semibold ${selected ? "text-amber-200" : "text-stone-700"}`}>{acc.badge}</span>
                   </button>
                 );
               })}

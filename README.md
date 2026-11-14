@@ -20,9 +20,9 @@ Web fullstack đặt lịch hẹn (salon/studio/phòng khám): khách chọn d�
 
 ## Tính năng
 
-**Khách:** chọn nhiều dịch vụ (tự cộng thời lượng) · chọn nhân viên · lịch giờ trống (giờ đã đặt bị mờ) · cọc 20% · email xác nhận · tra cứu lịch bằng mã + SĐT.
+**Khách:** chọn nhiều dịch vụ (tự cộng thời lượng) · chọn stylist cụ thể hoặc **tự xếp thợ rảnh** · lịch giờ trống theo thời gian thực (giờ đã đặt bị mờ) · cọc 20% (mô phỏng) · email xác nhận · tra cứu linh hoạt bằng **Mã đặt lịch hoặc SĐT** · tự hủy/đổi lịch nhả slot tức thì.
 
-**Admin (`/admin`):** dashboard doanh thu/tiền cọc/dịch vụ hot · danh sách lịch theo ngày + đổi trạng thái · **lịch tuần dạng lưới** (lọc theo nhân viên) · CRUD dịch vụ (ẩn/hiện) · giờ làm & ngày nghỉ của nhân viên.
+**Admin (`/admin`):** phân quyền **Chủ tiệm (`ADMIN`)** & **Thợ (`STAFF`)** · dashboard doanh thu/tiền cọc/dịch vụ hot · danh sách lịch theo ngày + đổi trạng thái · **lịch tuần dạng lưới** (lọc theo nhân viên) · CRUD Menu & dịch vụ (sửa giá inline, **tạm ngưng khi hết nguyên liệu**, ẩn/hiện) · giờ làm & ngày nghỉ của nhân viên · nút **Reset lịch test**.
 
 ## Tech stack
 
@@ -61,4 +61,4 @@ SQLite là file nên **không bền trên Vercel**. Khi deploy: tạo Postgres m
 
 ## Hướng phát triển
 
-Tích hợp PayOS/Stripe thật với kiểm tra chữ ký webhook · rate limit endpoint đặt lịch · tự chọn "bất kỳ nhân viên rảnh" · nhắc lịch qua email trước giờ hẹn.
+Tích hợp PayOS/Stripe thật với kiểm tra chữ ký webhook · rate limit endpoint đặt lịch · nhắc lịch qua email trước giờ hẹn.

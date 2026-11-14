@@ -30,9 +30,9 @@ const hhmm = (d: Date) => {
 };
 
 const COLORS: Record<string, string> = {
-  PENDING: "bg-amber-50 border-amber-500 text-amber-950",
-  CONFIRMED: "bg-blue-50 border-blue-500 text-blue-950",
-  COMPLETED: "bg-emerald-50 border-emerald-500 text-emerald-950",
+  PENDING: "bg-amber-100 border-amber-700 text-amber-950",
+  CONFIRMED: "bg-blue-100 border-blue-700 text-blue-950",
+  COMPLETED: "bg-emerald-100 border-emerald-700 text-emerald-950",
 };
 
 export default async function CalendarPage({
@@ -73,22 +73,22 @@ export default async function CalendarPage({
 
       <div className="reveal-up flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">
+          <h1 className="text-2xl font-extrabold tracking-tight text-stone-950">
             {isStaff ? `Lịch tuần của ${session.name}` : "Lịch tuần"} ({days[0].slice(8)}/{days[0].slice(5, 7)} – {days[6].slice(8)}/{days[6].slice(5, 7)})
           </h1>
-          <p className="text-sm text-stone-600">
+          <p className="text-sm font-medium text-stone-800">
             {isStaff ? "Các khung giờ khách đã đặt riêng với bạn trong tuần (UTC+7)." : "Theo dõi mật độ lịch hẹn theo từng khung giờ (UTC+7)."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-1.5 text-sm">
-          <Link href={q(addDays(monday, -7))} className="btn-interactive inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3.5 py-1.5 font-semibold text-stone-800 hover:border-stone-900">
+          <Link href={q(addDays(monday, -7))} className="btn-interactive inline-flex items-center gap-1 rounded-full border-2 border-stone-300 bg-white px-3.5 py-1.5 font-bold text-stone-950 hover:border-stone-900">
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             <span>Tuần trước</span>
           </Link>
-          <Link href={q(todayStr)} className="btn-interactive rounded-full border border-stone-900 bg-stone-900 px-4 py-1.5 font-semibold text-white hover:bg-amber-800 hover:border-amber-800">
+          <Link href={q(todayStr)} className="btn-interactive rounded-full border-2 border-stone-900 bg-stone-900 px-4 py-1.5 font-bold text-white hover:bg-amber-800 hover:border-amber-800">
             Hôm nay
           </Link>
-          <Link href={q(addDays(monday, 7))} className="btn-interactive inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3.5 py-1.5 font-semibold text-stone-800 hover:border-stone-900">
+          <Link href={q(addDays(monday, 7))} className="btn-interactive inline-flex items-center gap-1 rounded-full border-2 border-stone-300 bg-white px-3.5 py-1.5 font-bold text-stone-950 hover:border-stone-900">
             <span>Tuần sau</span>
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Link>
@@ -96,17 +96,17 @@ export default async function CalendarPage({
       </div>
 
       {/* Bộ lọc nhân viên */}
-      <div className="reveal-up delay-1 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white px-4 py-3 shadow-xs">
+      <div className="reveal-up delay-1 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-stone-300 bg-white px-4 py-3 shadow-xs">
         {isStaff ? (
-          <div className="text-xs font-semibold text-stone-700">
+          <div className="text-xs font-bold text-stone-800">
             Stylist: <span className="rounded-full bg-stone-900 px-3 py-1 text-white">{session.name}</span>
           </div>
         ) : (
-          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-            <span className="text-stone-500">Stylist:</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
+            <span className="text-stone-700">Stylist:</span>
             <Link
               href={`?week=${monday}`}
-              className={`btn-interactive rounded-full px-3.5 py-1.5 ${!sp.staff ? "bg-stone-900 text-white shadow-2xs" : "bg-stone-100 text-stone-700 hover:bg-stone-200"}`}
+              className={`btn-interactive rounded-full px-3.5 py-1.5 ${!sp.staff ? "bg-stone-900 text-white shadow-2xs" : "bg-stone-200 text-stone-900 hover:bg-stone-300"}`}
             >
               Tất cả thợ
             </Link>
@@ -114,30 +114,30 @@ export default async function CalendarPage({
               <Link
                 key={s.id}
                 href={`?week=${monday}&staff=${s.id}`}
-                className={`btn-interactive rounded-full px-3.5 py-1.5 ${sp.staff === s.id ? "bg-amber-800 text-white shadow-2xs" : "bg-stone-100 text-stone-700 hover:bg-stone-200"}`}
+                className={`btn-interactive rounded-full px-3.5 py-1.5 ${sp.staff === s.id ? "bg-amber-800 text-white shadow-2xs" : "bg-stone-200 text-stone-900 hover:bg-stone-300"}`}
               >
                 {s.user.name}
               </Link>
             ))}
           </div>
         )}
-        <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-stone-700">
-          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-amber-500" /> Chờ cọc</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-blue-600" /> Đã xác nhận</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-emerald-600" /> Hoàn thành</span>
+        <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-stone-900">
+          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-amber-600" /> Chờ cọc</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-blue-700" /> Đã xác nhận</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-emerald-700" /> Hoàn thành</span>
         </div>
       </div>
 
-      <div className="reveal-up delay-2 overflow-x-auto rounded-2xl border border-stone-200/90 bg-white shadow-sm">
+      <div className="reveal-up delay-2 overflow-x-auto rounded-2xl border-2 border-stone-300 bg-white shadow-sm">
         <div className="grid min-w-[820px] grid-cols-[60px_repeat(7,1fr)]">
-          <div className="border-b border-stone-200 bg-[#f5efe6]" />
+          <div className="border-b-2 border-stone-300 bg-[#e9dfd0]" />
           {days.map((d, i) => {
             const isToday = d === todayStr;
             return (
               <div
                 key={d}
-                className={`border-b border-l border-stone-200 px-2 py-2.5 text-center text-xs font-bold ${
-                  isToday ? "bg-amber-800 text-white" : "bg-[#f5efe6] text-stone-800"
+                className={`border-b-2 border-l border-stone-300 px-2 py-2.5 text-center text-xs font-extrabold ${
+                  isToday ? "bg-amber-800 text-white" : "bg-[#e9dfd0] text-stone-950"
                 }`}
               >
                 {DAY_NAMES[(i + 1) % 7]} {d.slice(8)}/{d.slice(5, 7)}
@@ -145,9 +145,9 @@ export default async function CalendarPage({
             );
           })}
 
-          <div className="relative bg-[#faf7f2]" style={{ height: hours.length * PX_PER_HOUR }}>
+          <div className="relative bg-[#faf6ef]" style={{ height: hours.length * PX_PER_HOUR }}>
             {hours.map((h, i) => (
-              <div key={h} className="absolute right-2 -translate-y-2 font-mono text-[11px] font-medium text-stone-500" style={{ top: i * PX_PER_HOUR }}>
+              <div key={h} className="absolute right-2 -translate-y-2 font-mono text-[11px] font-bold text-stone-800" style={{ top: i * PX_PER_HOUR }}>
                 {String(h).padStart(2, "0")}:00
               </div>
             ))}

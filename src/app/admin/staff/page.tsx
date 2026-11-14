@@ -19,17 +19,17 @@ export default async function StaffPage() {
     include: { user: true, timeOffs: { where: { end: { gt: new Date() } }, orderBy: { start: "asc" } } },
   });
   const inputCls =
-    "rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-800";
+    "rounded-xl border-2 border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-stone-950 placeholder:font-normal placeholder:text-stone-500 focus:border-amber-800";
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
       <AdminNav name={session.name} role={session.role} />
 
       <div className="reveal-up">
-        <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">
+        <h1 className="text-2xl font-extrabold tracking-tight text-stone-950">
           {isStaff ? `Ca làm & Ngày nghỉ của ${session.name}` : "Stylist & ca làm"}
         </h1>
-        <p className="text-sm text-stone-600">
+        <p className="text-sm font-medium text-stone-800">
           Cập nhật giờ làm việc và ngày nghỉ phép; lịch trống của khách tự động tính lại theo cài đặt này.
         </p>
       </div>
@@ -38,28 +38,28 @@ export default async function StaffPage() {
         {staff.map((s, idx) => (
           <section
             key={s.id}
-            className={`card-interactive reveal-up ${idx === 1 ? "delay-1" : idx === 2 ? "delay-2" : ""} space-y-4 overflow-hidden rounded-2xl border border-stone-200/90 bg-white p-5 shadow-xs`}
+            className={`card-interactive reveal-up ${idx === 1 ? "delay-1" : idx === 2 ? "delay-2" : ""} space-y-4 overflow-hidden rounded-2xl border-2 border-stone-300 bg-white p-5 shadow-xs`}
           >
-            <div className="flex items-center gap-3.5 border-b border-stone-200 pb-3.5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-base font-bold text-amber-100 shadow-2xs">
+            <div className="flex items-center gap-3.5 border-b-2 border-stone-200 pb-3.5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-base font-extrabold text-amber-200 shadow-2xs">
                 {s.user.name.slice(0, 1).toUpperCase()}
               </div>
               <div>
-                <h2 className="font-bold text-stone-900">{s.user.name}</h2>
-                <div className="text-xs font-semibold text-amber-800">{s.specialty}</div>
+                <h2 className="font-extrabold text-stone-950">{s.user.name}</h2>
+                <div className="text-xs font-bold text-amber-900">{s.specialty}</div>
               </div>
             </div>
 
-            <form action={updateStaffHours} className="space-y-2 rounded-xl border border-stone-200 bg-[#faf7f2] p-3.5 text-sm">
+            <form action={updateStaffHours} className="space-y-2 rounded-xl border-2 border-stone-300 bg-[#faf6ef] p-3.5 text-sm">
               <input type="hidden" name="staffId" value={s.id} />
-              <div className="flex items-center gap-1.5 text-xs font-bold text-stone-800">
+              <div className="flex items-center gap-1.5 text-xs font-extrabold text-stone-950">
                 <Clock className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" />
                 <span>Khung giờ làm việc</span>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <label htmlFor={`start-${s.id}`} className="sr-only">Giờ bắt đầu của {s.user.name}</label>
                 <input id={`start-${s.id}`} type="time" name="workStart" step={1800} defaultValue={hhmm(s.workStart)} className={inputCls} />
-                <span className="text-stone-500">→</span>
+                <span className="font-bold text-stone-800">→</span>
                 <label htmlFor={`end-${s.id}`} className="sr-only">Giờ kết thúc của {s.user.name}</label>
                 <input id={`end-${s.id}`} type="time" name="workEnd" step={1800} defaultValue={hhmm(s.workEnd)} className={inputCls} />
                 <button type="submit" className="btn-interactive rounded-full bg-amber-800 px-3.5 py-2 text-xs font-bold text-white hover:bg-amber-900">
@@ -68,10 +68,10 @@ export default async function StaffPage() {
               </div>
             </form>
 
-            <form action={createTimeOff} className="space-y-2 rounded-xl border border-stone-200 bg-[#faf7f2] p-3.5 text-sm">
+            <form action={createTimeOff} className="space-y-2 rounded-xl border-2 border-stone-300 bg-[#faf6ef] p-3.5 text-sm">
               <input type="hidden" name="staffId" value={s.id} />
-              <div className="flex items-center gap-1.5 text-xs font-bold text-stone-800">
-                <CalendarOff className="h-3.5 w-3.5 text-amber-700" aria-hidden="true" />
+              <div className="flex items-center gap-1.5 text-xs font-extrabold text-stone-950">
+                <CalendarOff className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" />
                 <span>Đăng ký ngày nghỉ</span>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -87,10 +87,10 @@ export default async function StaffPage() {
 
             {s.timeOffs.length > 0 && (
               <div className="space-y-1.5">
-                <div className="text-xs font-bold text-stone-600">Ngày nghỉ sắp tới</div>
+                <div className="text-xs font-extrabold text-stone-900">Ngày nghỉ sắp tới</div>
                 <ul className="space-y-1.5 text-sm">
                   {s.timeOffs.map((t) => (
-                    <li key={t.id} className="drawer-enter flex items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950">
+                    <li key={t.id} className="drawer-enter flex items-center justify-between gap-2 rounded-xl border-2 border-amber-400 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">
                       <span>
                         <b>{fmtDate(t.start)}</b> {t.reason && `– ${t.reason}`}
                       </span>

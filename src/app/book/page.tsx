@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Calendar, Check, Clock, Sparkles, User } from "lucide-react";
+import { AlertCircle, Calendar, Check, Clock, Sparkles, User, Users } from "lucide-react";
 import { formatVND } from "@/lib/format";
 
 type Service = {
@@ -15,7 +15,13 @@ type Service = {
   unavailableReason: string;
 };
 type Staff = { id: string; name: string; specialty: string };
-type Slot = { time: string; start: string; available: boolean };
+type Slot = {
+  time: string;
+  start: string;
+  available: boolean;
+  assignedStaffId?: string;
+  assignedStaffName?: string;
+};
 
 const today = () => new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10);
 
@@ -78,19 +84,20 @@ export default function BookPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!slot) return;
+    const effectiveStaffId = staffId === "ANY" ? (slot.assignedStaffId || "") : staffId;
+    if (!effectiveStaffId) return;
+
     setLoading(true);
     setError("");
     const res = await fetch("/api/bookings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ serviceIds: selected, staffId, start: slot.start, ...form }),
+      body: JSON.stringify({ serviceIds: selected, staffId: effectiveStaffId, start: slot.start, ...form }),
     });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
       setError(data.error);
-      // Chỉ khi trùng giờ (409) mới bỏ chọn slot và tải lại danh sách;
-      // lỗi nhập liệu (400) giữ nguyên slot để user sửa rồi bấm đặt lại.
       if (res.status === 409) {
         setSlotStart("");
         setReloadKey((k) => k + 1);
@@ -108,45 +115,56 @@ export default function BookPage() {
   ];
 
   const doneSteps = steps.filter((s) => s.done).length;
-  const card = "reveal-up rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 shadow-xs";
+  const card = "reveal-up rounded-2xl border-2 border-stone-300 bg-white p-5 sm:p-6 shadow-sm";
   const inputCls =
-    "w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 transition focus:border-amber-800";
+    "w-full rounded-xl border-2 border-stone-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-stone-950 placeholder:font-normal placeholder:text-stone-500 transition focus:border-amber-800";
+
+  const staffSummaryLabel =
+    staffId === "ANY"
+      ? slot?.assignedStaffName
+        ? `Tự xếp (${slot.assignedStaffName})`
+        : "Để tiệm tự xếp thợ rảnh"
+      : chosenStaff
+        ? chosenStaff.name
+        : "Chưa chọn";
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
-      {/* Tiêu đề thoáng sáng & thanh tiến độ nhẹ nhàng */}
+      {/* Tiêu đề & thanh tiến độ độ tương phản cao */}
       <div className="reveal-up space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-stone-900 sm:text-3xl">Đặt lịch hẹn</h1>
-            <p className="mt-1 text-sm text-stone-600">Chọn dịch vụ, stylist quen và khung giờ phù hợp với bạn.</p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-stone-950 sm:text-3xl">Đặt lịch hẹn</h1>
+            <p className="mt-1 text-sm font-medium text-stone-800">
+              Chọn dịch vụ, stylist quen (hoặc để tiệm tự xếp) và khung giờ phù hợp với bạn.
+            </p>
           </div>
-          <span className="rounded-full border border-stone-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-stone-700 shadow-2xs">
-            Hoàn thành: <span className="text-amber-800">{doneSteps}/4</span> bước
+          <span className="rounded-full border-2 border-stone-300 bg-white px-3.5 py-1.5 text-xs font-bold text-stone-900 shadow-2xs">
+            Hoàn thành: <span className="text-amber-900">{doneSteps}/4</span> bước
           </span>
         </div>
 
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-200" aria-hidden="true">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-stone-300" aria-hidden="true">
           <div
             className="h-full w-full origin-left rounded-full bg-amber-800 transition-transform duration-300 ease-out"
             style={{ transform: `scaleX(${doneSteps / 4})` }}
           />
         </div>
 
-        {/* Stepper tối giản */}
+        {/* Stepper */}
         <nav aria-label="Tiến trình đặt lịch" className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {steps.map((st) => (
             <div
               key={st.num}
-              className={`flex items-center gap-2.5 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2.5 rounded-xl border-2 px-3.5 py-2.5 text-sm font-bold transition-all duration-200 ${
                 st.done
-                  ? "border-emerald-700 bg-emerald-700 text-white shadow-xs"
-                  : "border-stone-200/90 bg-white text-stone-700"
+                  ? "border-emerald-800 bg-emerald-700 text-white shadow-xs"
+                  : "border-stone-300 bg-white text-stone-900"
               }`}
             >
               <span
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-transform duration-200 ${
-                  st.done ? "scale-105 bg-white text-emerald-700" : "bg-stone-100 text-stone-700"
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-extrabold transition-transform duration-200 ${
+                  st.done ? "scale-105 bg-white text-emerald-800" : "bg-stone-200 text-stone-900"
                 }`}
               >
                 {st.done ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : st.num}
@@ -162,7 +180,7 @@ export default function BookPage() {
           {/* Bước 1: Dịch vụ */}
           <section className={card}>
             <fieldset>
-              <legend className="mb-1 flex items-center gap-2.5 text-base font-bold text-stone-900">
+              <legend className="mb-1 flex items-center gap-2.5 text-base font-extrabold text-stone-950">
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors ${
                     selected.length > 0 ? "bg-emerald-700" : "bg-stone-900"
@@ -171,15 +189,15 @@ export default function BookPage() {
                   1
                 </span>
                 <span>
-                  Chọn dịch vụ {selected.length > 0 && <span className="text-xs font-semibold text-amber-800">({selected.length} đã chọn)</span>}
+                  Chọn dịch vụ {selected.length > 0 && <span className="text-xs font-bold text-amber-900">({selected.length} đã chọn)</span>}
                 </span>
               </legend>
-              <p className="mb-4 text-xs text-stone-500">Bạn có thể kết hợp nhiều dịch vụ trong một lần hẹn.</p>
+              <p className="mb-4 text-xs font-medium text-stone-700">Bạn có thể kết hợp nhiều dịch vụ trong một lần hẹn.</p>
 
               {services.length === 0 ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[1, 2, 3, 4].map((n) => (
-                    <div key={n} className="h-24 animate-pulse rounded-xl border border-stone-200 bg-stone-100" />
+                    <div key={n} className="h-24 animate-pulse rounded-xl border-2 border-stone-300 bg-stone-200" />
                   ))}
                 </div>
               ) : (
@@ -190,12 +208,12 @@ export default function BookPage() {
                     return (
                       <label
                         key={s.id}
-                        className={`card-interactive relative flex flex-col justify-between rounded-xl p-4 focus-within:ring-2 focus-within:ring-amber-700 ${
+                        className={`card-interactive relative flex flex-col justify-between rounded-xl p-4 focus-within:ring-2 focus-within:ring-amber-800 ${
                           paused
-                            ? "cursor-not-allowed border border-amber-200 bg-amber-50/40 opacity-75"
+                            ? "cursor-not-allowed border-2 border-amber-400 bg-amber-50/80 opacity-85"
                             : checked
-                              ? "cursor-pointer border-2 border-stone-900 bg-[#faf6f0] shadow-xs"
-                              : "cursor-pointer border border-stone-200 bg-white hover:border-stone-400"
+                              ? "cursor-pointer border-2 border-stone-950 bg-[#fdf8f0] shadow-xs"
+                              : "cursor-pointer border-2 border-stone-300 bg-white hover:border-stone-800"
                         }`}
                       >
                         <input
@@ -210,19 +228,19 @@ export default function BookPage() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="space-y-1">
                             <span
-                              className={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                                checked ? "bg-stone-900 text-white" : "bg-amber-50 text-amber-900"
+                              className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                                checked ? "bg-stone-900 text-white" : "border border-amber-700/30 bg-amber-100 text-amber-950"
                               }`}
                             >
                               {s.category}
                             </span>
-                            <div className="font-bold text-stone-900">{s.name}</div>
-                            <div className="text-xs text-stone-500">{s.description}</div>
+                            <div className="font-extrabold text-stone-950">{s.name}</div>
+                            <div className="text-xs font-medium text-stone-700">{s.description}</div>
                           </div>
                           {!paused && (
                             <span
-                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-white transition-all duration-150 ${
-                                checked ? "scale-110 border-stone-900 bg-stone-900" : "border-stone-300 bg-white"
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-white transition-all duration-150 ${
+                                checked ? "scale-110 border-stone-950 bg-stone-950" : "border-stone-600 bg-white"
                               }`}
                             >
                               {checked && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
@@ -231,16 +249,16 @@ export default function BookPage() {
                         </div>
                         {paused ? (
                           <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-                            <span className="font-bold text-stone-500 line-through">{formatVND(s.price)}</span>
-                            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 font-semibold text-amber-900">
+                            <span className="font-bold text-stone-700 line-through">{formatVND(s.price)}</span>
+                            <span className="rounded-full border border-amber-700/40 bg-amber-100 px-2.5 py-0.5 font-bold text-amber-950">
                               Tạm ngưng: {s.unavailableReason}
                             </span>
                           </div>
                         ) : (
-                          <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-2.5 text-sm">
-                            <span className="font-bold text-stone-900">{formatVND(s.price)}</span>
-                            <span className="inline-flex items-center gap-1 text-xs text-stone-600">
-                              <Clock className="h-3.5 w-3.5 text-stone-400" aria-hidden="true" />
+                          <div className="mt-3 flex items-center justify-between border-t border-stone-200 pt-2.5 text-sm">
+                            <span className="font-extrabold text-stone-950">{formatVND(s.price)}</span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-800">
+                              <Clock className="h-3.5 w-3.5 text-stone-700" aria-hidden="true" />
                               {s.durationMinutes} phút
                             </span>
                           </div>
@@ -255,7 +273,7 @@ export default function BookPage() {
 
           {/* Bước 2: Nhân viên & Ngày */}
           <section className={card + " delay-1 space-y-5"}>
-            <div className="flex items-center gap-2.5 text-base font-bold text-stone-900">
+            <div className="flex items-center gap-2.5 text-base font-extrabold text-stone-950">
               <span
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors ${
                   staffId && date ? "bg-emerald-700" : "bg-stone-900"
@@ -267,17 +285,50 @@ export default function BookPage() {
             </div>
 
             <fieldset>
-              <legend className="mb-2.5 text-sm font-medium text-stone-700">Stylist thực hiện</legend>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <legend className="mb-2.5 text-sm font-bold text-stone-900">Stylist thực hiện</legend>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Tùy chọn tự động xếp thợ rảnh */}
+                <label
+                  className={`card-interactive flex cursor-pointer items-center gap-3 rounded-xl p-3.5 focus-within:ring-2 focus-within:ring-amber-800 ${
+                    staffId === "ANY"
+                      ? "border-2 border-stone-950 bg-stone-900 text-white shadow-sm"
+                      : "border-2 border-dashed border-amber-700 bg-amber-50/60 text-stone-950 hover:border-stone-900"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="staffId"
+                    value="ANY"
+                    checked={staffId === "ANY"}
+                    onChange={() => setStaffId("ANY")}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                      staffId === "ANY" ? "bg-amber-700 text-white" : "bg-amber-800 text-white"
+                    }`}
+                  >
+                    <Users className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className={`block truncate text-sm font-extrabold ${staffId === "ANY" ? "text-white" : "text-stone-950"}`}>
+                      Tự xếp thợ rảnh
+                    </span>
+                    <span className={`block truncate text-xs font-medium ${staffId === "ANY" ? "text-amber-200" : "text-stone-700"}`}>
+                      Ưu tiên còn trống giờ
+                    </span>
+                  </span>
+                </label>
+
                 {staff.map((st) => {
                   const active = staffId === st.id;
                   return (
                     <label
                       key={st.id}
-                      className={`card-interactive flex cursor-pointer items-center gap-3 rounded-xl p-3.5 focus-within:ring-2 focus-within:ring-amber-700 ${
+                      className={`card-interactive flex cursor-pointer items-center gap-3 rounded-xl p-3.5 focus-within:ring-2 focus-within:ring-amber-800 ${
                         active
-                          ? "border-2 border-stone-900 bg-stone-900 text-white shadow-sm"
-                          : "border border-stone-200 bg-white text-stone-900 hover:border-stone-400"
+                          ? "border-2 border-stone-950 bg-stone-900 text-white shadow-sm"
+                          : "border-2 border-stone-300 bg-white text-stone-950 hover:border-stone-800"
                       }`}
                     >
                       <input
@@ -289,17 +340,17 @@ export default function BookPage() {
                         className="sr-only"
                       />
                       <span
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold transition-colors ${
-                          active ? "bg-amber-800 text-white" : "bg-stone-100 text-stone-800"
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold transition-colors ${
+                          active ? "bg-amber-700 text-white" : "bg-stone-200 text-stone-900"
                         }`}
                       >
                         {st.name.slice(0, 1).toUpperCase()}
                       </span>
                       <span className="min-w-0">
-                        <span className={`block truncate text-sm font-bold ${active ? "text-white" : "text-stone-900"}`}>
+                        <span className={`block truncate text-sm font-extrabold ${active ? "text-white" : "text-stone-950"}`}>
                           {st.name}
                         </span>
-                        <span className={`block truncate text-xs ${active ? "text-stone-300" : "text-stone-500"}`}>
+                        <span className={`block truncate text-xs font-medium ${active ? "text-stone-200" : "text-stone-700"}`}>
                           {st.specialty}
                         </span>
                       </span>
@@ -310,7 +361,7 @@ export default function BookPage() {
             </fieldset>
 
             <div className="max-w-md space-y-1.5">
-              <label htmlFor="book-date" className="block text-sm font-medium text-stone-700">
+              <label htmlFor="book-date" className="block text-sm font-bold text-stone-900">
                 Ngày hẹn
               </label>
               <div className="flex flex-wrap items-center gap-2">
@@ -332,13 +383,13 @@ export default function BookPage() {
                         .slice(0, 10);
                       setDate(tmr);
                     }}
-                    className="btn-interactive rounded-full border border-stone-300 bg-stone-100 px-3.5 py-2 text-xs font-semibold text-stone-800 hover:bg-stone-900 hover:text-white"
+                    className="btn-interactive rounded-full border-2 border-stone-300 bg-stone-100 px-3.5 py-2 text-xs font-bold text-stone-900 hover:border-stone-900 hover:bg-stone-900 hover:text-white"
                   >
                     Chọn ngày mai (đầy đủ 09:00 – 17:30)
                   </button>
                 )}
               </div>
-              <p className="text-xs text-stone-500">
+              <p className="text-xs font-medium text-stone-700">
                 Lưu ý: Nếu chọn hôm nay, các khung giờ đã qua theo đồng hồ thực tế sẽ tự động khóa.
               </p>
             </div>
@@ -347,7 +398,7 @@ export default function BookPage() {
           {/* Bước 3: Khung giờ */}
           <section className={card + " delay-2 space-y-4"}>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5 text-base font-bold text-stone-900">
+              <div className="flex items-center gap-2.5 text-base font-extrabold text-stone-950">
                 <span
                   className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white transition-colors ${
                     slot ? "bg-emerald-700" : "bg-stone-900"
@@ -357,26 +408,26 @@ export default function BookPage() {
                 </span>
                 <span>Chọn giờ {duration ? `(${duration} phút)` : ""}</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-stone-600">
+              <div className="flex items-center gap-3 text-xs font-bold text-stone-800">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full border border-stone-400 bg-white" /> Trống
+                  <span className="h-3 w-3 rounded-full border-2 border-stone-600 bg-white" /> Trống
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-stone-900" /> Đang chọn
+                  <span className="h-3 w-3 rounded-full bg-stone-950" /> Đang chọn
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-stone-300" /> Đã kín
+                  <span className="h-3 w-3 rounded-full bg-stone-400" /> Đã kín
                 </span>
               </div>
             </div>
 
             {!staffId || !selected.length ? (
-              <div className="rounded-xl border border-dashed border-stone-300 bg-[#faf7f2] p-5 text-center text-sm text-stone-600">
-                Hãy chọn ít nhất 1 dịch vụ và 1 stylist ở bước trên để xem khung giờ trống.
+              <div className="rounded-xl border-2 border-dashed border-stone-400 bg-[#f6f0e6] p-5 text-center text-sm font-semibold text-stone-800">
+                Hãy chọn ít nhất 1 dịch vụ và 1 stylist (hoặc Tự xếp thợ rảnh) ở bước trên để xem khung giờ trống.
               </div>
             ) : visibleSlots.length === 0 ? (
-              <div className="drawer-enter rounded-xl border border-amber-300 bg-amber-50 p-5 text-center text-sm text-amber-900">
-                Stylist không làm việc hoặc đã kín lịch vào ngày này. Vui lòng thử ngày khác.
+              <div className="drawer-enter rounded-xl border-2 border-amber-600/50 bg-amber-50 p-5 text-center text-sm font-semibold text-amber-950">
+                Stylist không làm việc hoặc đã kín lịch vào ngày này. Vui lòng thử ngày khác hoặc chọn &quot;Tự xếp thợ rảnh&quot;.
               </div>
             ) : (
               <div className="drawer-enter grid grid-cols-3 gap-2.5 sm:grid-cols-5">
@@ -389,12 +440,12 @@ export default function BookPage() {
                       disabled={!s.available}
                       aria-pressed={isSelected}
                       onClick={() => setSlotStart(s.start)}
-                      className={`slot-btn min-h-11 rounded-xl border py-2.5 text-sm ${
+                      className={`slot-btn min-h-11 rounded-xl border-2 py-2.5 text-sm ${
                         isSelected
-                          ? "border-stone-900 bg-stone-900 font-bold text-white shadow-xs"
+                          ? "border-stone-950 bg-stone-900 font-extrabold text-white shadow-xs"
                           : s.available
-                            ? "border-stone-300 bg-white font-semibold text-stone-800 hover:border-stone-900 hover:bg-stone-50"
-                            : "cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400 line-through"
+                            ? "border-stone-300 bg-white font-bold text-stone-950 hover:border-stone-900 hover:bg-amber-50/70"
+                            : "cursor-not-allowed border-stone-300 bg-stone-200 font-medium text-stone-600 line-through"
                       }`}
                     >
                       {s.time}
@@ -415,13 +466,13 @@ export default function BookPage() {
               >
                 4
               </span>
-              <h2 id="contact-heading" className="text-base font-bold text-stone-900">Thông tin liên hệ</h2>
+              <h2 id="contact-heading" className="text-base font-extrabold text-stone-950">Thông tin liên hệ</h2>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5 sm:col-span-2">
-                <label htmlFor="customerName" className="block text-sm font-medium text-stone-700">
-                  Họ và tên <span aria-hidden="true" className="text-red-600">*</span>
+                <label htmlFor="customerName" className="block text-sm font-bold text-stone-900">
+                  Họ và tên <span aria-hidden="true" className="text-red-700">*</span>
                 </label>
                 <input
                   id="customerName"
@@ -438,10 +489,10 @@ export default function BookPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="customerPhone" className="block text-sm font-medium text-stone-700">
-                  Số điện thoại <span aria-hidden="true" className="text-red-600">*</span>
+                <label htmlFor="customerPhone" className="block text-sm font-bold text-stone-900">
+                  Số điện thoại <span aria-hidden="true" className="text-red-700">*</span>
                 </label>
-                <span id="phone-hint" className="block text-xs text-stone-500">
+                <span id="phone-hint" className="block text-xs font-medium text-stone-700">
                   Định dạng: 10–11 số bắt đầu bằng 0 hoặc +84
                 </span>
                 <input
@@ -462,10 +513,10 @@ export default function BookPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="customerEmail" className="block text-sm font-medium text-stone-700">
-                  Email nhận xác nhận <span aria-hidden="true" className="text-red-600">*</span>
+                <label htmlFor="customerEmail" className="block text-sm font-bold text-stone-900">
+                  Email nhận xác nhận <span aria-hidden="true" className="text-red-700">*</span>
                 </label>
-                <span id="email-hint" className="block text-xs text-stone-500">
+                <span id="email-hint" className="block text-xs font-medium text-stone-700">
                   Dùng để gửi thông tin & mã tra cứu lịch hẹn
                 </span>
                 <input
@@ -487,20 +538,20 @@ export default function BookPage() {
             </div>
 
             {error && (
-              <div role="alert" aria-live="polite" className="drawer-enter flex items-start gap-2.5 rounded-xl border border-red-300 bg-red-50 p-3.5 text-sm text-red-700">
+              <div role="alert" aria-live="polite" className="drawer-enter flex items-start gap-2.5 rounded-xl border-2 border-red-400 bg-red-50 p-3.5 text-sm font-semibold text-red-800">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div className="flex flex-col gap-3 border-t border-stone-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-xs text-stone-500">
+            <div className="flex flex-col gap-3 border-t-2 border-stone-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-xs font-semibold text-stone-800">
                 {slot ? "Nhấn đặt lịch để giữ khung giờ này trong 10 phút." : "Vui lòng chọn đầy đủ dịch vụ, stylist và khung giờ."}
               </div>
               <button
                 type="submit"
                 disabled={!slot || loading}
-                className="btn-interactive inline-flex min-h-11 items-center justify-center rounded-full bg-amber-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-900 disabled:cursor-not-allowed disabled:opacity-45"
+                className="btn-interactive inline-flex min-h-11 items-center justify-center rounded-full bg-amber-800 px-6 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-amber-900 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
                   ? "Đang giữ chỗ..."
@@ -512,70 +563,70 @@ export default function BookPage() {
           </form>
         </div>
 
-        {/* Cột phải: Phiếu tóm tắt lịch hẹn Salon ấm áp */}
-        <aside className="reveal-up delay-2 rounded-3xl border border-stone-300/90 bg-[#f5efe6] p-6 text-stone-900 shadow-sm lg:sticky lg:top-24">
-          <div className="flex items-center justify-between gap-2 border-b border-stone-300/80 pb-3.5">
+        {/* Cột phải: Phiếu tóm tắt lịch hẹn với header tối tương phản sắc nét */}
+        <aside className="reveal-up delay-2 overflow-hidden rounded-3xl border-2 border-stone-900 bg-white text-stone-950 shadow-md lg:sticky lg:top-24">
+          <div className="flex items-center justify-between gap-2 bg-stone-900 px-6 py-4 text-white">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-800" aria-hidden="true" />
-              <h2 className="font-bold text-stone-900">Phiếu tóm tắt lịch hẹn</h2>
+              <Sparkles className="h-4 w-4 text-amber-300" aria-hidden="true" />
+              <h2 className="font-extrabold text-white">Phiếu tóm tắt lịch hẹn</h2>
             </div>
-            <span className="rounded-full bg-stone-900 px-2.5 py-0.5 text-xs font-semibold text-white">
+            <span className="rounded-full bg-amber-700 px-2.5 py-0.5 text-xs font-bold text-white">
               {chosen.length} món
             </span>
           </div>
 
-          <div className="mt-4 space-y-4 text-sm">
+          <div className="space-y-4 p-6 text-sm">
             <div>
-              <div className="text-xs font-bold tracking-wider text-stone-500 uppercase">Dịch vụ đã chọn</div>
+              <div className="text-xs font-extrabold tracking-wider text-stone-700 uppercase">Dịch vụ đã chọn</div>
               {chosen.length === 0 ? (
-                <p className="mt-1.5 text-stone-500">Chưa chọn dịch vụ nào</p>
+                <p className="mt-1.5 font-medium text-stone-700">Chưa chọn dịch vụ nào</p>
               ) : (
                 <ul className="mt-2.5 space-y-2">
                   {chosen.map((c) => (
-                    <li key={c.id} className="drawer-enter flex items-center justify-between gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2">
-                      <span className="font-medium text-stone-800">{c.name} ({c.durationMinutes}p)</span>
-                      <span className="font-semibold text-stone-900">{formatVND(c.price)}</span>
+                    <li key={c.id} className="drawer-enter flex items-center justify-between gap-2 rounded-xl border border-stone-300 bg-[#faf6ef] px-3 py-2">
+                      <span className="font-bold text-stone-900">{c.name} ({c.durationMinutes}p)</span>
+                      <span className="font-extrabold text-stone-950">{formatVND(c.price)}</span>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            <div className="space-y-2 border-t border-stone-300/80 pt-3.5">
+            <div className="space-y-2.5 border-t border-stone-300 pt-3.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-stone-600">
-                  <User className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" /> Stylist
+                <span className="inline-flex items-center gap-1.5 font-semibold text-stone-700">
+                  <User className="h-4 w-4 text-amber-800" aria-hidden="true" /> Stylist
                 </span>
-                <span className="font-semibold text-stone-900">{chosenStaff ? chosenStaff.name : "Chưa chọn"}</span>
+                <span className="font-extrabold text-stone-950">{staffSummaryLabel}</span>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-stone-600">
-                  <Calendar className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" /> Ngày & Giờ
+                <span className="inline-flex items-center gap-1.5 font-semibold text-stone-700">
+                  <Calendar className="h-4 w-4 text-amber-800" aria-hidden="true" /> Ngày & Giờ
                 </span>
-                <span className="font-semibold text-stone-900">
+                <span className="font-extrabold text-stone-950">
                   {slot ? `${slot.time} · ${date.split("-").reverse().join("/")}` : "Chưa chọn giờ"}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-stone-600">
-                  <Clock className="h-3.5 w-3.5 text-amber-800" aria-hidden="true" /> Tổng thời lượng
+                <span className="inline-flex items-center gap-1.5 font-semibold text-stone-700">
+                  <Clock className="h-4 w-4 text-amber-800" aria-hidden="true" /> Tổng thời lượng
                 </span>
-                <span className="font-semibold text-stone-900">{duration} phút</span>
+                <span className="font-extrabold text-stone-950">{duration} phút</span>
               </div>
             </div>
 
-            <div className="space-y-2 rounded-2xl border border-stone-200 bg-white p-4">
-              <div className="flex items-center justify-between text-stone-600">
+            <div className="space-y-2 rounded-2xl border-2 border-amber-800/35 bg-[#fdf6eb] p-4">
+              <div className="flex items-center justify-between font-semibold text-stone-800">
                 <span>Tổng chi phí</span>
-                <span className="font-bold text-stone-900">{formatVND(total)}</span>
+                <span className="font-extrabold text-stone-950">{formatVND(total)}</span>
               </div>
-              <div className="flex items-center justify-between border-t border-stone-100 pt-2 text-base">
-                <span className="font-bold text-stone-900">Cọc trước (20%)</span>
-                <span className="text-lg font-extrabold text-amber-800">{formatVND(deposit)}</span>
+              <div className="flex items-center justify-between border-t border-amber-800/20 pt-2 text-base">
+                <span className="font-extrabold text-stone-950">Cọc trước (20%)</span>
+                <span className="text-lg font-extrabold text-amber-900">{formatVND(deposit)}</span>
               </div>
             </div>
 
-            <p className="rounded-xl bg-white/70 p-3 text-xs leading-relaxed text-stone-600">
+            <p className="rounded-xl border border-stone-300 bg-stone-100 p-3 text-xs leading-relaxed font-medium text-stone-800">
               Sau khi nhấn đặt lịch, khung giờ được giữ trong 10 phút để bạn hoàn tất xác nhận cọc.
             </p>
           </div>

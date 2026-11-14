@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f2;
-  --foreground: #1c1917;
+  --background: #f0e9dd;
+  --foreground: #141210;
   color-scheme: light;
   accent-color: #78350f;
 }
@@ -16,7 +16,7 @@
 
 ::selection {
   background-color: #fde68a;
-  color: #1c1917;
+  color: #141210;
 }
 
 body {
@@ -25,22 +25,23 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* Nền kem vải lanh ấm áp, dịu mắt cho tiệm salon */
+/* Nền kem vải lanh ấm áp, dịu mắt nhưng tách khối rõ với thẻ trắng */
 .bg-ambient-canvas {
   position: fixed;
   inset: 0;
   z-index: -10;
   overflow: hidden;
   pointer-events: none;
-  background: linear-gradient(180deg, #faf7f2 0%, #f5efe6 55%, #faf7f2 100%);
+  background: linear-gradient(180deg, #f3ede2 0%, #eae0d0 55%, #f3ede2 100%);
 }
 
-/* Input/select luôn chữ tối, nền trắng (tránh bị chữ trắng khi trình duyệt ở dark mode) */
+/* Input/select luôn chữ tối đậm, nền trắng (tránh bị chữ trắng khi trình duyệt ở dark mode) */
 input,
 select,
 textarea {
   background-color: #ffffff;
-  color: #1c1917;
+  color: #141210;
+  font-weight: 500;
   font-size: max(1rem, 1em);
 }
 

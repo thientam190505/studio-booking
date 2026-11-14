@@ -3,30 +3,17 @@
 Dự án: web đặt lịch dịch vụ để đưa vào CV của chủ repo (sinh viên năm 4). Đường dẫn: `D:\Antigravity\Dự án Git\booking-platform`. Đặc tả gốc: `..\PROJECT_SPEC.md`. Hướng dẫn chạy: `README.md`.
 
 ## Trạng thái hiện tại
-- **Chức năng đã xong và chạy được:** đặt lịch của khách (`/book`), tra cứu (`/lookup`), thanh toán cọc mô phỏng, email xác nhận (log console nếu chưa có SMTP), admin (`/admin`: dashboard, `/admin/calendar` lịch tuần, `/admin/services`, `/admin/staff`).
-- **Đã kiểm tra:** `npm run build`, `npx tsc --noEmit`, `npx eslint src scripts tests`, `npm test`, `npm run test:race` đều qua.
-- **Chưa kiểm tra bằng mắt:** giao diện trên trình duyệt sau các lần sửa gần nhất. Hãy chạy `npm run dev` và xem thật.
-- **Git:** nhiều commit, tên tác giả tạm là `dev` / `dev@local`. Chưa có remote, chưa push.
+- **Chức năng đã xong và chạy được:**
+  - Khách hàng: chọn nhiều dịch vụ, chọn stylist cụ thể hoặc **Tự xếp thợ rảnh** (`/book`), giữ chỗ 10 phút + thanh toán cọc mô phỏng + tự hủy/đổi lịch (`/booking/[code]`), tra cứu linh hoạt bằng **Mã đặt lịch hoặc SĐT** (`/lookup`), email xác nhận.
+  - Quản trị & Stylist: phân quyền `ADMIN` (toàn quyền, CRUD Menu & báo hết nguyên liệu/tạm ngưng món) và `STAFF` (3 tài khoản thợ riêng chỉ xem lịch & ca làm của mình), lịch tuần dạng lưới (`/admin/calendar`), ca làm & ngày nghỉ (`/admin/staff`), Reset lịch test.
+- **Giao diện:** Phong cách **Warm Minimalist Hair Salon** độ tương phản cao, hiệu ứng CSS compositor mượt mà, kèm thanh thông tin liên hệ cá nhân (Facebook, TikTok, Gmail).
+- **Git:** Đang dùng nhánh `main` local, chưa gắn remote GitHub.
 
-## Việc user giao cho model giao diện (Gemini 4 Argon)
-Chỉ làm **giao diện/UX**, đừng đổi logic nghiệp vụ. File liên quan: `src/app/page.tsx`, `src/app/book/page.tsx`, `src/app/booking/[code]/*`, `src/app/lookup/page.tsx`, `src/app/admin/**` (các `page.tsx`, `AdminNav.tsx`, `login/page.tsx`), `src/app/globals.css`, `src/app/layout.tsx`.
-Gợi ý: trang chủ có hero và giới thiệu dịch vụ; bước đặt lịch rõ ràng (stepper, thẻ tóm tắt đơn); trạng thái loading/lỗi; responsive cho điện thoại; trang admin gọn, dễ nhìn.
-
-## Quy tắc BẮT BUỘC khi sửa
-1. **Không cài thêm phần mềm ngoài máy** (user yêu cầu). Thêm gói npm nhỏ thì được; không dùng Docker hay DB server.
-2. **Giữ giao diện sáng:** `globals.css` đã ép `color-scheme: light`. Trình duyệt user ở dark mode từng làm chữ trắng trên nền trắng. Nếu thêm màu, kiểm tra độ tương phản.
-3. **Không phá logic chống trùng lịch:** `src/lib/booking.ts` (transaction) và `src/lib/availability.ts`. Sau khi sửa, chạy `npm run test:race`, kỳ vọng đúng 1/3 thành công.
-4. **Múi giờ cố định UTC+7** (`SHOP_TZ_OFFSET`). Đừng dùng `new Date()` cục bộ để tính ngày/giờ hiển thị cho cửa hàng.
-5. **Next.js 16:** `cacheComponents` đã bị tắt trong `next.config.ts` vì làm `/book` lỗi `Date.now()`. Đừng bật lại. `params` và `searchParams` là Promise. Lint bật rule `react-hooks/set-state-in-effect`, nên tránh `setState` đồng bộ trong `useEffect` (xem cách `book/page.tsx` suy ra `slot` thay vì lưu state).
-6. **Ghi file có tiếng Việt:** từng có lần PowerShell `Set-Content` làm hỏng UTF-8 của `layout.tsx`. Khi ghi bằng script, dùng `[IO.File]::WriteAllText(path, text, (New-Object Text.UTF8Encoding $false))`, hoặc dùng công cụ ghi file trực tiếp.
-7. **Giữ nguyên comment và cấu trúc không liên quan.** Commit theo Conventional Commits (`feat:`, `fix:`, `style:`, `refactor:`).
-8. Trước khi báo xong: `npm run build`, `npx tsc --noEmit`, `npx eslint src scripts tests`, `npm test` phải sạch.
-
-## Việc còn lại sau giao diện (user đã quyết định "tính sau")
-1. Quay GIF demo, dán vào README.
-2. Tạo repo GitHub, đặt lại `git config user.name/user.email` của user rồi push.
-3. Deploy: SQLite không bền trên Vercel, nên cần Postgres (Neon/Supabase). Đổi `provider` trong `prisma/schema.prisma`, đặt `DATABASE_URL` và `AUTH_SECRET`, chạy `prisma db push` và `npm run seed`. Bỏ ghi chú "SQLite" trong README sau khi đổi, và điền link Live Demo.
-4. Ý tưởng mở rộng (không bắt buộc): PayOS/Stripe thật có kiểm tra chữ ký webhook, rate limit endpoint đặt lịch, tùy chọn "bất kỳ nhân viên rảnh".
+## Việc còn lại khi đưa lên Online (Deploy & CV)
+1. Quay GIF / chụp ảnh màn hình demo dán vào `README.md`.
+2. Tạo repo GitHub, đặt `git config user.name` / `user.email`, gắn remote và `git push -u origin main`.
+3. Deploy (Vercel): SQLite (`prisma/dev.db`) là file cục bộ chỉ dùng cho local, không lưu bền trên serverless Vercel. Khi deploy, tạo Postgres miễn phí (Supabase/Neon), đổi `provider = "postgresql"` trong `prisma/schema.prisma`, đặt `DATABASE_URL` & `AUTH_SECRET`, chạy `npx prisma db push && npm run seed`, cập nhật link Live Demo trong `README.md`.
+4. Ý tưởng mở rộng (không bắt buộc): PayOS/Stripe thật có kiểm tra chữ ký webhook, rate limit endpoint đặt lịch, nhắc lịch email trước giờ hẹn.
 
 ## Lệnh hay dùng
 ```
