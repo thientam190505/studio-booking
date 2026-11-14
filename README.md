@@ -2,7 +2,7 @@
 
 Web fullstack đặt lịch hẹn (salon/studio/phòng khám): khách chọn dịch vụ → nhân viên → khung giờ trống theo thời gian thực, cọc online (mô phỏng), admin quản lý lịch, ca làm và doanh thu.
 
-> **Live demo:** _(thêm link Vercel sau khi deploy)_
+> **Live demo:** https://studio-booking-one-lovat.vercel.app
 > - **Chủ quán (`ADMIN`):** `admin@demo.com` / `admin123` (toàn quyền)
 > - **3 Thợ (`STAFF`):** `minhanh@demo.com`, `quocbao@demo.com`, `thuha@demo.com` / `staff123` (chỉ thấy lịch & ca làm của riêng mình)
 
@@ -26,14 +26,14 @@ Web fullstack đặt lịch hẹn (salon/studio/phòng khám): khách chọn d�
 
 ## Tech stack
 
-Next.js (App Router) · TypeScript · TailwindCSS · Prisma ORM · SQLite (dev) · Zod · Nodemailer · bcryptjs
+Next.js (App Router) · TypeScript · TailwindCSS · Prisma ORM · PostgreSQL (Prisma Postgres / Vercel) · Zod · Nodemailer · bcryptjs
 
 ## Chạy local
 
 ```bash
 npm install
-cp .env.example .env     # Windows: copy .env.example .env
-npx prisma db push       # tạo dev.db
+cp .env.example .env     # Windows: copy .env.example .env (điền DATABASE_URL PostgreSQL)
+npx prisma db push       # tạo bảng trên PostgreSQL
 npm run seed             # dữ liệu mẫu + tài khoản admin
 npm run dev              # http://localhost:3000
 ```
@@ -55,9 +55,9 @@ src/app/admin/     dashboard, calendar, services, staff
 tests/ scripts/    unit test, race test, smoke test
 ```
 
-## Deploy (Vercel)
+## Deploy (Vercel + Prisma Postgres)
 
-SQLite là file nên **không bền trên Vercel**. Khi deploy: tạo Postgres miễn phí (Neon/Supabase), đổi `provider = "postgresql"` trong `prisma/schema.prisma`, đặt `DATABASE_URL`, `AUTH_SECRET` trong Environment Variables rồi `prisma db push` + `npm run seed`.
+Dự án đã cấu hình sẵn `provider = "postgresql"` trong `prisma/schema.prisma`, `postinstall: prisma generate` trong `package.json`, và chạy thực tế trên **Vercel** kết hợp **Prisma Postgres** với biến môi trường `DATABASE_URL` + `AUTH_SECRET`. Chi tiết vận hành xem tại [`HUONG_DAN_SU_DUNG.md`](HUONG_DAN_SU_DUNG.md).
 
 ## Hướng phát triển
 

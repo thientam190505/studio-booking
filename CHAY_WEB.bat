@@ -23,7 +23,20 @@ if not exist ".env" (
     if exist ".env.example" (
         echo [1/4] Dang tao file cau hinh .env tu .env.example...
         copy /Y ".env.example" ".env" >nul
+        echo [LUU Y] Hay dan chuoi PostgreSQL DATABASE_URL that vao file .env truoc khi chay local!
+        echo Hoac mo truc tiep ban Web Online: https://studio-booking-one-lovat.vercel.app
+        pause
+        exit /b 1
     )
+)
+
+findstr /C:"USER:PASSWORD@HOST" ".env" >nul
+if %errorlevel%==0 (
+    echo [LUU Y] File .env van dang de chuoi mau USER:PASSWORD@HOST.
+    echo Hay dan chuoi DATABASE_URL PostgreSQL that vao .env, hoac truy cap ban Online:
+    echo   https://studio-booking-one-lovat.vercel.app
+    pause
+    exit /b 1
 )
 
 if not exist "node_modules" (
@@ -36,11 +49,8 @@ if not exist "node_modules" (
     )
 )
 
-if not exist "prisma\dev.db" (
-    echo [3/4] Dang khoi tao Database SQLite va du lieu mau...
-    call npx prisma db push
-    call npm run seed
-)
+echo [3/4] Dang dong bo Prisma Client voi PostgreSQL...
+call npx prisma generate >nul 2>nul
 
 netstat -ano | findstr ":3000 " | findstr "LISTENING" >nul
 if %errorlevel%==0 (
